@@ -84,13 +84,13 @@ echo -en "${NC}"
 echo -e "${YELLOW}You will be asked for the deVT password as we are about to copy to the devt host${NC}"
 echo -e "rename /var/www/html/static/mytrack/rpi/install.zip /var/www/html/static/mytrack/rpi/install-${DATE}.zip\n put install.zip /var/www/html/static/mytrack/rpi/install.zip" | sftp deVT@devt.nz
 
-rm -r install
-rm install.zip
-rm -r packagefiles
-rm -r rpi
-rm -r src
-rm version
-rm README.md
+#rm -r install
+#rm install.zip
+#rm -r packagefiles
+#rm -r rpi
+#rm -r src
+#rm version
+#rm README.md
 
 
 echo -e "${GREEN}Build Complete${NC}"
