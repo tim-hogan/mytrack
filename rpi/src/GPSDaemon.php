@@ -17,7 +17,7 @@ $alllocs = array();
 $allts = array();
 
 $host = "track.devt.nz";
-$g_api = "myTrackApi.php?r=";
+$g_api = "myTrackApi.php";
 
 $g_uuid = file_get_contents("/etc/machine-id");
 $g_uuid = trim($g_uuid);
@@ -76,7 +76,7 @@ function getHostLastSerial()
     global $host;
     global $g_api;
 
-    $url = "https://{$host}/{$g_api}lastserial/{$g_uuid}";
+    $url = "https://{$host}/{$g_api}?r=lastserial/{$g_uuid}";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
