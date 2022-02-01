@@ -39,7 +39,7 @@ git init
 git remote add mytrack git@github.com:tim-hogan/mytrack.git
 git pull mytrack $BRANCH
 
-chmod +x ./src/install.sh
+chmod +x ./rpi//src/install.sh
 #*****************************************************************************************
 # Start of build
 #*****************************************************************************************
