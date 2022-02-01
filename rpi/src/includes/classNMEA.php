@@ -27,6 +27,8 @@ class NMEA
             return false;
         if (substr($s,-3,1) != "*")
             return false;
+        if ( !ctype_xdigit(substr($s,-2,2)) )
+            return false;
         $test = unpack("C*",hex2bin(substr($s,-2,2))) [1];
         $cs = self::createChecksum(substr($s,1,strlen($s)-4));
         return ($cs == $test);
