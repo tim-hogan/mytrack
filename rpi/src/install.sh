@@ -93,6 +93,10 @@ cp ${DIR}/tmpfiles/includes/classNMEA.php /etc/GPS/includes/classNMEA.php
 
 chmod +x /etc/mytrack/GPSDaemon.php
 
+echo "Copy the installAll scripts"
+cp ${DIR}/tmpfiles/scripts/installAll.sh ../installAll.sh
+chmod +x ../installAll.sh
+
 #create configuration file
 echo "[source]
 api = "myTrackApi.php?r="
@@ -100,7 +104,7 @@ hostname = track.devt.nz
 " > /etc/GPS/GPS.conf
 
 
-#Need to edit the service file to add the correct 
+#Need to copy the service file 
 cp ${DIR}/tmpfiles/bin/GPS.service /etc/systemd/system
 
 echo "Enabling the GPS service"
@@ -110,6 +114,8 @@ systemctl start GPS
 systemctl enable GPS
 systemctl status GPS
 
+echo "Copy back install script"
+cp ../installAll.sh
 
 echo "Cleanup"
 rm -r ${DIR}/tmpfiles

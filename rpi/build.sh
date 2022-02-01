@@ -52,7 +52,7 @@ emptyandcreate install
 emptyandcreate packagefiles
 
 #copy the install script
-cp ./rpi/src/install.sh					./install
+cp ./rpi/src/install.sh						./install
 
 #change directory to the files and copy them up.
 cd packagefiles
@@ -65,6 +65,8 @@ cp ../rpi/src/GPSSetup.php						./bin
 emptyandcreate includes
 cp ../rpi/src/includes/classNMEA.php			./includes
 
+emptyandcreate scripts
+cp ../rpi/src/installAll.sh					    ./scripts
 
 #All files now copied, now packge it up
 tar -zcf ../install/rpi.tar.gz .
@@ -74,10 +76,6 @@ cd ..
 #Copy back the build
 cp ./rpi/build.sh .
 chmod +x build.sh
-
-#copy back install script
-cp ./rpi/src/installAll.sh .
-chmod +x installAll.sh
 
 echo -e "The file will be packaged with a password"
 echo -en "${CYAN}"
