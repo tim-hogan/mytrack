@@ -219,9 +219,9 @@ function recoverFromfile($last_serial)
 {
     global $strTraceFile;
 
-    
+
     $seq = -1;
-    
+
     $ftrace = fopen($strTraceFile,"r");
     if ($ftrace)
     {
@@ -229,21 +229,26 @@ function recoverFromfile($last_serial)
         while (! feof($ftrace))
         {
             $line = fgets($ftrace);
-            $seq = intval(strtok($line,","));
-            if ($seq > $last_serial)
+            if (strlen($line) > 5)
             {
-                $v = array();
-                $v["s"] = $seq;
-                $v["t"] = intval(strtok(","));
-                $v["a"] = floatval(strtok(","));
-                $v["b"] = floatval(strtok(","));
-                $v["c"] = floatval(strtok(","));
-                $v["h"] = floatval(strtok(","));
-                if ($v["t"] > 0)
-                    post($v,true,true,null);
+                $seq = intval(strtok($line,","));
+                if ($seq > $last_serial)
+                {
+                    $v = array();
+                    $v["s"] = $seq;
+                    $v["t"] = intval(strtok(","));
+                    $v["a"] = floatval(strtok(","));
+                    $v["b"] = floatval(strtok(","));
+                    $v["c"] = floatval(strtok(","));
+                    $v["h"] = floatval(strtok(","));
+                    if ($v["t"] > 0)
+                        post($v,true,true,null);
+                }
             }
         }
         fclose($ftrace);
+
+        echo "read recovery file and last seq in file is {$seq}\n";
     }
 
     return $seq;
@@ -320,6 +325,7 @@ else
     echo "Recovering from file\n";
     $serial = recoverFromfile($g_last_serial);
     $serial++;
+    echo "Recovered from file next serial is {$serial}\n";
 }
 
 
