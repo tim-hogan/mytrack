@@ -91,7 +91,7 @@ cp ${DIR}/tmpfiles/bin/GPSSetup.php /etc/GPS/GPSSetup.php
 mkdir -p /etc/GPS/includes
 cp ${DIR}/tmpfiles/includes/classNMEA.php /etc/GPS/includes/classNMEA.php
 
-chmod +x /etc/mytrack/GPSDaemon.php
+chmod +x /etc/GPS/GPSDaemon.php
 
 echo "Copy the installAll scripts"
 cp ${DIR}/tmpfiles/scripts/installAll.sh ../installAll.sh

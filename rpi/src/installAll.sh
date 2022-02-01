@@ -9,4 +9,5 @@ cd install
 chmod +x install.sh
 ./install.sh
 cd ..
+echo "Install all script finised"
 
