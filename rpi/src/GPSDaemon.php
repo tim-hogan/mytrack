@@ -140,7 +140,7 @@ function sendBunch()
     $params["device"] = $g_uuid;
     $params["entries"] = $entries;
 
-    $url = "https://{$host}/{$g_api}bunch";
+    $url = "https://{$host}/{$g_api}?r=bunch";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -219,6 +219,9 @@ function recoverFromfile($last_serial)
 {
     global $strTraceFile;
 
+    
+    $seq = -1;
+    
     $ftrace = fopen($strTraceFile,"r");
     if ($ftrace)
     {
@@ -242,6 +245,8 @@ function recoverFromfile($last_serial)
         }
         fclose($ftrace);
     }
+
+    return $seq;
 }
 
 
@@ -313,7 +318,8 @@ else
     fclose($f1);
 
     echo "Recovering from file\n";
-    recoverFromfile($g_last_serial);
+    $serial = recoverFromfile($g_last_serial);
+    $serial++;
 }
 
 

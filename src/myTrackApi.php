@@ -122,7 +122,7 @@ function storeBunch($req,$params)
         returnError($req,1004,"No entries");
 
     $entries = $params["entries"];
-    
+
     $n = count($entries);
     error_log("Bunch receipt - recevied {$n} entries");
 
@@ -132,8 +132,11 @@ function storeBunch($req,$params)
         $DB->createLoc($uuid,$e);
     }
 
-    $data["lastserial"] = $DB->getLastLocSerial($uuid);
-
+    $lastserial = $DB->getLastLocSerial($uuid);
+    if ($lastserial === false)
+        $data["lastserial"] = -1;
+    else
+        $data["lastserial"] = $lastserial;
 
     $ret = array();
     $ret['meta'] = newOKMetaHdr($req);
