@@ -32,7 +32,7 @@ emptyandcreate () {
 #*****************************************************************************************
 # Git pulls
 #*****************************************************************************************
-echo -e "Getting gsp rpi tracj from GitHub"
+echo -e "Getting GPS mytrack from GitHub"
 rm -fr .git
 rm -fr *
 git init
