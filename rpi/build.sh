@@ -75,6 +75,9 @@ cd ..
 cp ./rpi/build.sh .
 chmod +x build.sh
 
+#copy back install script
+cp ./rpi/src/installAll.sh .
+chmod +x installAll.sh
 
 echo -e "The file will be packaged with a password"
 echo -en "${CYAN}"
