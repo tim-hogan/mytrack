@@ -215,7 +215,9 @@ function post($v,$ignoreSend=false,$ignoreTrace=false)
 
 function recoverFromfile($last_serial)
 {
-    $ftrace = fopen("TrackData.txt","r");
+    global $strTraceFile;
+
+    $ftrace = fopen($strTraceFile,"r");
     if ($ftrace)
     {
         $line = fgets($ftrace);
@@ -268,21 +270,23 @@ if ($v)
 }
 
 
+$strTraceFile = "/var/GPS/TrackData.txt";
 
 $ftrace = null;
 
 //Find last line of a file
-if (! file_exists("TrackData.txt"))
+if (! file_exists($strTraceFile))
 {
     debug("No existing data found - starting with serial of 0");
-    $ftrace = fopen("TrackData.txt","a");
+    $ftrace = fopen($strTraceFile,"a");
     fwrite($ftrace,"SEQ,TIMESTAMP,LATTITUDE,LONGITUDE,HEIGHT,HDOP\n");
     fclose($ftrace);
 }
 else
 {
-    $sz = filesize("TrackData.txt");
-    $f1 = fopen("TrackData.txt","r");
+    $lastline="";
+    $sz = filesize($strTraceFile);
+    $f1 = fopen($strTraceFile,"r");
     debug("Existing file found of size {$sz}");
     if ($sz > 200)
         fseek($f1,-100,SEEK_END);
@@ -313,7 +317,7 @@ else
 
 echo "Starting GPS logger with serial {$serial}\n";
 
-$ftrace = fopen("TrackData.txt","a");
+$ftrace = fopen($strTraceFile,"a");
 
 $f = fopen("/dev/ttyS0","w+");
 

@@ -58,7 +58,8 @@ if [ "$UNINSTALL" -eq 1 ] ; then
     systemctl stop GPS
     rm /etc/systemd/system/GPS.service
     systemctl daemon-reload
-    rm -r /etc/mytrack/  
+    rm -r /etc/GPS
+    rm -r /var/GPS
     echo -e "${GREEN}Uninstall complete${NC}"
     exit 0;
 fi
@@ -93,6 +94,10 @@ cp ${DIR}/tmpfiles/includes/classNMEA.php /etc/GPS/includes/classNMEA.php
 
 chmod +x /etc/GPS/GPSDaemon.php
 
+mkdir -p /var/GPS
+chmod 777 /var/GPS
+
+
 echo "Copy the installAll script"
 cp ${DIR}/tmpfiles/scripts/installAll.sh ../installAll.sh
 chmod +x ../installAll.sh
@@ -115,6 +120,6 @@ systemctl enable GPS
 systemctl status GPS
 
 echo "Cleanup"
-rm -r ${DIR}/tmpfiles
+#rm -r ${DIR}/tmpfiles
 
 echo -e "${GREEN}Installed${NC}"
