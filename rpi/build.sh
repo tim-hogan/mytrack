@@ -72,7 +72,7 @@ tar -zcf ../install/rpi.tar.gz .
 cd ..
 
 #Copy back the build
-cp ../rpi/build.sh .
+cp ./rpi/build.sh .
 chmod +x build.sh
 
 
