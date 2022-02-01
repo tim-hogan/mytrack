@@ -158,7 +158,7 @@ function sendBunch()
     return false;
 }
 
-function post($v,$ignoreSend=false,$ignoreTrace=false)
+function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
 {
     global $allts;
     global $alllocs;
@@ -194,6 +194,8 @@ function post($v,$ignoreSend=false,$ignoreTrace=false)
             }
         }
 
+        if ($speed > 500 && $sentence)
+            error_log("Invalid GPS data - speed too high {$speed}km/hr, offending sentence is {$sentence}");
         if (!$ignoreSend)
         {
             if (count($alllocs) > 0)
@@ -235,7 +237,7 @@ function recoverFromfile($last_serial)
                 $v["c"] = floatval(strtok(","));
                 $v["h"] = floatval(strtok(","));
                 if ($v["t"] > 0)
-                    post($v,true,true);
+                    post($v,true,true,null);
             }
         }
         fclose($ftrace);
@@ -335,7 +337,7 @@ if ($f)
                 {
                     unset($v["type"]);
                     $v["s"] = $serial;
-                    if (post($v) )
+                    if (post($v,false,false,$s) )
                         $serial++;
                 }
             }
