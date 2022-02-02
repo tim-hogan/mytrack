@@ -106,6 +106,8 @@ chmod +x ../installAll.sh
 echo "[source]
 api=myTrackApi.php
 hostname=track.devt.nz
+maxspeed=500
+mindist=50
 " > /etc/GPS/GPS.conf
 
 

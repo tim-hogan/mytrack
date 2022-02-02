@@ -16,9 +16,10 @@ $g_last_lon = 0;
 $alllocs = array();
 $allts = array();
 
-$host = "track.devt.nz";
+$g_host = "track.devt.nz";
 $g_api = "myTrackApi.php";
-
+$g_max_speed = 500.0;   //If this speed (in km/hr) between two points is greater than this then ignore the point
+$g_min_distance=0.050;   //If the distance (in km) from the last point is less than this ignore the point
 $g_uuid = file_get_contents("/etc/machine-id");
 $g_uuid = trim($g_uuid);
 
@@ -73,10 +74,10 @@ function getResultData($result)
 function getHostLastSerial()
 {
     global $g_uuid;
-    global $host;
+    global $g_host;
     global $g_api;
 
-    $url = "https://{$host}/{$g_api}?r=lastserial/{$g_uuid}";
+    $url = "https://{$g_host}/{$g_api}?r=lastserial/{$g_uuid}";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -121,7 +122,7 @@ function deleteUpTo($last)
 function sendBunch()
 {
     global $g_uuid;
-    global $host;
+    global $g_host;
     global $g_api;
     global $alllocs;
 
@@ -140,7 +141,7 @@ function sendBunch()
     $params["device"] = $g_uuid;
     $params["entries"] = $entries;
 
-    $url = "https://{$host}/{$g_api}?r=bunch";
+    $url = "https://{$g_host}/{$g_api}?r=bunch";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -166,6 +167,8 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
     global $g_last_ts;
     global $g_last_lat;
     global $g_last_lon;
+    global $g_max_speed;
+    global $g_min_distance;
 
     $ret = false;
 
@@ -175,11 +178,11 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
         //Now check that the distance is more than 50 metres and time from last is greater than 15 minutes
 
         $dist = DistKM($g_last_lat,$g_last_lon,$v["a"],$v["b"]);
-        $speed = ($dist / ($v["t"] - $g_last_ts)) * 3600;
-        if ($speed < 500.0)
+        $speed = ($dist / ($v["t"] - $g_last_ts)) * 3600.0;
+        if ($speed < $g_max_speed)
         {
 
-            if ($v["t"] > $g_last_ts + (15*60) || $dist > 0.050 || $ignoreTrace)
+            if ($v["t"] > $g_last_ts + (15*60) || $dist > $g_min_distance || $ignoreTrace)
             {
                 $allts[] = $v["t"];
                 $alllocs[$v["s"]] = $v;
@@ -223,6 +226,9 @@ function recoverFromfile($last_serial)
     $seq = -1;
 
     $ftrace = fopen($strTraceFile,"r");
+    $ftracenew = fopen($strTraceFile . ".new","w");
+    fwrite($ftracenew,"SEQ,TIMESTAMP,LATTITUDE,LONGITUDE,HEIGHT,HDOP\n");
+
     if ($ftrace)
     {
         $line = fgets($ftrace);
@@ -242,11 +248,17 @@ function recoverFromfile($last_serial)
                     $v["c"] = floatval(strtok(","));
                     $v["h"] = floatval(strtok(","));
                     if ($v["t"] > 0)
+                    {
+                        fwrite($ftracenew,$line);
                         post($v,true,true,null);
+                    }
                 }
             }
         }
         fclose($ftrace);
+        fclose($ftracenew);
+        unlink($strTraceFile);
+        rename($strTraceFile . ".new",$strTraceFile);
 
         echo "read recovery file and last seq in file is {$seq}\n";
     }
@@ -265,13 +277,16 @@ function recoverFromfile($last_serial)
 $config = parse_ini_file("/etc/GPS/GPS.conf");
 
 if ($config["hostname"])
-    $host = $config["hostname"];
-
+    $g_host = $config["hostname"];
 if ($config["api"])
     $g_api = $config["api"];
+if ($config["maxspeed"])
+    $g_max_speed = floatval($config["maxspeed"]);
+if ($config["mindist"])
+    $g_min_distance=floatval($config["mindist"]) / 1000.0;
 
 echo "Start - configuration details:\n";
-echo " host - {$host}\n";
+echo " host - {$g_host}\n";
 echo " api - {$g_api}\n";
 
 $v = getHostLastSerial();
@@ -305,7 +320,6 @@ else
     while (! feof($f1))
     {
         $line = fgets($f1);
-        debug("reading lines fwd for near end {$line}");
         if (strlen($line > 5))
             $lastline = $line;
     }
