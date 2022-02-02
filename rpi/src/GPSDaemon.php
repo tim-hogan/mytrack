@@ -57,7 +57,7 @@ function DistKM($lat,$long,$dlat,$dlong)
 function getLocalIP()
 {
     $output= array();
-    int $rslt;
+    $rslt = 0;
     $r = exec ("ifconfig",$output,$rslt);
     if ($rslt == 0)
     {
