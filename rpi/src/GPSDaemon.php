@@ -198,7 +198,7 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
         }
 
         if ($speed > 500 && $sentence)
-            error_log("Invalid GPS data - speed too high {$speed}km/hr, offending sentence is {$sentence}");
+            error_log("Invalid GPS data - speed too high {$speed}km/hr, decoded lat/lon {$v["a"]}/{$v["b"]} last lat/lon {$g_last_lat}/{$g_last_lon} offending sentence is {$sentence}");
         if (!$ignoreSend)
         {
             if (count($alllocs) > 0)
