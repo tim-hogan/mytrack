@@ -142,10 +142,11 @@ function getHostLastSerial()
 
     $result = curl_exec($ch);
     $data = getResultData($result);
+    
     if ($data !== false)
     {
-        if (isset($result["data"] ["lastserial"]) )
-            return intval($result["data"] ["lastserial"]);
+        if (isset($data["lastserial"]) )
+            return intval($data["lastserial"]);
     }
     return false;
 }

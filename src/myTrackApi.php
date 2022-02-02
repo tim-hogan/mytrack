@@ -84,7 +84,7 @@ function getLastSerial($req,$uuid)
     $serial = $DB->getLastLocSerial($uuid);
     if ($serial === false)
         returnError($req,1002,"No data");
-
+    
     $data["lastserial"] = $serial;
 
     $ret = array();
@@ -124,11 +124,9 @@ function storeBunch($req,$params)
     $entries = $params["entries"];
 
     $n = count($entries);
-    error_log("Bunch receipt - recevied {$n} entries");
 
     foreach ($entries as $e)
     {
-        error_log(" serial {$e["s"]}");
         $DB->createLoc($uuid,$e);
     }
 
@@ -137,6 +135,7 @@ function storeBunch($req,$params)
         $data["lastserial"] = -1;
     else
         $data["lastserial"] = $lastserial;
+
 
     $ret = array();
     $ret['meta'] = newOKMetaHdr($req);
