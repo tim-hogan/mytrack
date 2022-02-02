@@ -280,6 +280,7 @@ function recoverFromfile($last_serial)
 
 
     $seq = -1;
+    echo "recoverFromFile - Last database serial is {$last_serial}\n";
 
     $ftrace = fopen($strTraceFile,"r");
     $ftracenew = fopen($strTraceFile . ".new","w");

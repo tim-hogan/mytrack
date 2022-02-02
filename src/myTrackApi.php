@@ -157,8 +157,7 @@ function processHello($req,$params)
         $uuid = $params["device"];
 
     if (isset($params["ipaddress"]))
-        $ipaddress = $params["deipaddressvice"];
-
+        $ipaddress = $params["ipaddress"];
 
     $device = $DB->getDeviceByUUID($uuid);
     if (! $device)

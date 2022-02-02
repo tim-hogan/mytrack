@@ -134,12 +134,15 @@ class NMEA
         try
         {
             $dtTS = new \DateTime($strdate . " " . $strtime);
-            if (abs( $dtNow->getTimestamp() - $dtTS->getTimestamp() ) < $seconds)
-                return $dtTS->getTimestamp();
         }
         catch (Exception $e)
         {
+            return false;
         }
+        
+        if (abs( $dtNow->getTimestamp() - $dtTS->getTimestamp() ) < $seconds)
+                return $dtTS->getTimestamp();
+        
         return false;
     }
 
