@@ -145,6 +145,40 @@ function storeBunch($req,$params)
     exit();
 }
 
+function processHello($req,$params)
+{
+    global $DB;
+
+
+    $uuid = 0;
+    $ipaddress = "";
+
+    if (isset($params["device"]))
+        $uuid = $params["device"];
+
+    if (isset($params["ipaddress"]))
+        $ipaddress = $params["deipaddressvice"];
+
+
+    $device = $DB->getDeviceByUUID($uuid);
+    if (! $device)
+    {
+        $device = $DB->createDevice($uuid,"Auto created");
+    }
+
+    if (! $device)
+        returnError($req,1003,"Bad device");
+
+    //Update the IP address of the device
+    $DB->updateDeviceIP($device->iddevice,$ipaddress);
+
+    $ret = array();
+    $ret['meta'] = newOKMetaHdr($req);
+    $ret['data'] = [];
+    echo json_encode($ret);
+    exit();
+
+}
 
 //Start
 if (!isset($_GET['r']))
@@ -188,6 +222,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT'  || $_SERVER['REQUEST_METHOD'] == 'POST'
     {
     case 'bunch':
         storeBunch($req,$params);
+        break;
+    case 'hello':
+        processHello($req,$params);
         break;
     default:
         returnError($req,1000,"Invalid parameter");

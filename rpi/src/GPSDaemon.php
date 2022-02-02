@@ -53,6 +53,34 @@ function DistKM($lat,$long,$dlat,$dlong)
     return (6378.15 * acos($theta));
 }
 
+
+function getLocalIP()
+{
+    $output= array();
+    int $rslt;
+    $r = exec ("ifconfig",$output,$rslt);
+    if ($rslt == 0)
+    {
+        $start = false;
+        foreach($output as $o)
+        {
+            $o = trim($o);
+            if ($start)
+            {
+                if (substr($o,0,5) == "inet ")
+                {
+                    $a = explode(" ",$o);
+                    return $a[1];
+                }
+            }
+            else
+                if (substr($o,0,6) == "wlan0:")
+                    $start = true;
+
+        }
+    }
+    return "";
+}
 /**
  * External functions
  */
@@ -69,6 +97,34 @@ function getResultData($result)
         }
     }
     return false;
+}
+
+function sendHello()
+{
+    global $g_uuid;
+    global $g_host;
+    global $g_api;
+
+    $params["device"] = $g_uuid;
+    $params["ipaddress"] = getLocalIP();
+
+    $url = "https://{$g_host}/{$g_api}?r=hello";
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($params));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+
+    $result = curl_exec($ch);
+    $data = getResultData($result);
+    if ($data !== false)
+    {
+        if (isset($data["lastserial"]) )
+            return intval($data["lastserial"]);
+    }
+    return false;
+
 }
 
 function getHostLastSerial()
@@ -288,6 +344,10 @@ if ($config["mindist"])
 echo "Start - configuration details:\n";
 echo " host - {$g_host}\n";
 echo " api - {$g_api}\n";
+echo " maxspeed - {$g_max_speed}\n";
+echo " mindist - {$g_min_distance}\n";
+
+sendHello();
 
 $v = getHostLastSerial();
 if ($v)

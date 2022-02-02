@@ -15,6 +15,7 @@ class device extends TableRow
                     "iddevice" =>["type" => "int"],
                     "device_uuid" =>["type" => "varchar"],
                     "device_serial" =>["type" => "int"],
+                    "device_ip_address"=>["type" => "varchar"],
                     "device_name" =>["type" => "varchar"]
                 ]
             );
@@ -82,6 +83,11 @@ class MyTrackDB extends SQLPlus
         if ($this->p_create("insert into device (device_uuid,device_serial,device_name) values (?,?,?)","sis",$uuid,$serial,$name) )
             return $this->getDeviceByUUID($uuid);
         return false;
+    }
+
+    public function updateDeviceIP($id,$ipaddress)
+    {
+        return $this->p_update("update device set device_ip_address = ? where iddevice = ?","si",$ipaddress,$id);
     }
 
     //*********************************************************************
