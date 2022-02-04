@@ -87,7 +87,8 @@ class MyTrackDB extends SQLPlus
 
     public function updateDeviceIP($id,$ipaddress)
     {
-        return $this->p_update("update device set device_ip_address = ? where iddevice = ?","si",$ipaddress,$id);
+        $strDT = (new DateTime())->format("Y-m-d H:i:s");
+        return $this->p_update("update device set device_ip_address = ?, set device_last_hello = ? where iddevice = ?","si",$ipaddress,$strDT,$id);
     }
 
     //*********************************************************************
