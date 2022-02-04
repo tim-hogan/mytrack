@@ -92,13 +92,18 @@ class NMEA
             if (count($b) !=2 )
                 return false;
             $l = strlen($b[0]);
-            $deg = intval(substr($b[0],0,$l-2));
-            $min = intval(substr($b[0],$l-2,2));
-            $l = strlen($b[1]);
-            $dec = floatval($b[1]) / pow(10,$l);
-            $min = floatval($min) + $dec;
-            $deg = $deg + ($min / 60.0);
-            return $deg;
+            if ($l >= 4)
+            {
+                $deg = intval(substr($b[0],0,$l-2));
+                $min = intval(substr($b[0],$l-2,2));
+                $l = strlen($b[1]);
+                $dec = floatval($b[1]) / pow(10,$l);
+                $min = floatval($min) + $dec;
+                $deg = $deg + ($min / 60.0);
+                return $deg;
+            }
+            else
+                return false;
         }
         catch (Exception $e)
         {
@@ -139,10 +144,10 @@ class NMEA
         {
             return false;
         }
-        
+
         if (abs( $dtNow->getTimestamp() - $dtTS->getTimestamp() ) < $seconds)
                 return $dtTS->getTimestamp();
-        
+
         return false;
     }
 
@@ -183,7 +188,8 @@ class NMEA
                 $strtime = $ts[0];
                 $timemilli = $ts[1];
 
-                $dtSerial = self::isDateTimeWithin($strdate,$strtime,300);
+                $dtSerial = self::isDateTimeWithin($strdate,$strtime,10000000);
+                //$dtSerial = self::isDateTimeWithin($strdate,$strtime,300);
                 if (!$dtSerial)
                     return false;
                 $lat = self::decodeLat($fields[2],$fields[3]);

@@ -38,4 +38,11 @@ foreach($a as $s)
         var_dump($decode);
 }
 
+$str = '$GNGGA,001933.000,4117.1214,S,176.4487,E,1,08,1.08,61.2,M,19.0,M,,*51';
+$a = NMEA::parseSentances($str);
+$strdate = "2022-02-03";
+$decode = NMEA::decodeSentence($a[0],$strdate);
+var_dump($decode);
+
+
 ?>
