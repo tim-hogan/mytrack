@@ -353,8 +353,8 @@ if ($config["boxlatmax"])
     $globalParams["box"]['maxlat']=floatval($config["boxlatmax"]);
 if ($config["boxlonmin"])
     $globalParams["box"]['minlon']=floatval($config["boxlonmin"]);
-if ($config["boxlonmaz"])
-    $globalParams["box"]['maxlon']=floatval($config["boxlonmaz"]);
+if ($config["boxlonmax"])
+    $globalParams["box"]['maxlon']=floatval($config["boxlonmax"]);
 
 echo "Start - configuration details:\n";
 echo " host - {$globalParams["host"]}\n";
