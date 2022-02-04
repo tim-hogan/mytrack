@@ -233,7 +233,7 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
 
     $ret = false;
 
-    if ( ! pointInBox($v["a"],$v["b"]),$globalParams["box"]) )
+    if ( ! pointInBox($v["a"],$v["b"],$globalParams["box"]) )
         return false;
     if (array_search($v["t"],$allts) === false)
     {
