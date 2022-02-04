@@ -108,6 +108,10 @@ api=myTrackApi.php
 hostname=track.devt.nz
 maxspeed=500
 mindist=50
+boxlatmin=-47.4
+boxlatmax=-34.0
+boxlonmin=166.0
+boxlonmax=178.8
 " > /etc/GPS/GPS.conf
 
 

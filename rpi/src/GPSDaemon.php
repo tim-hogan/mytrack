@@ -6,6 +6,15 @@ use devt\NMEA\NMEA;
 define("__DEBUG__",false);
 
 //Globals
+$globalParams= array();
+$globalParams["box"] = array();
+$globalParams["max_speed"] = 500.0; //If this speed (in km/hr) between two points is greater than this then ignore the point
+$globalParams["min_distance"] = 0.050; //If the distance (in km) from the last point is less than this ignore the point
+$globalParams["host"] = "track.devt.nz";
+$globalParams["api"] = "myTrackApi.php";
+$globalParams["uuid"] = trim(file_get_contents("/etc/machine-id"));
+
+
 $serial = 0;
 $g_strdate = "";
 $g_last_serial = -1;
@@ -15,13 +24,6 @@ $g_last_lon = 0;
 
 $alllocs = array();
 $allts = array();
-
-$g_host = "track.devt.nz";
-$g_api = "myTrackApi.php";
-$g_max_speed = 500.0;   //If this speed (in km/hr) between two points is greater than this then ignore the point
-$g_min_distance=0.050;   //If the distance (in km) from the last point is less than this ignore the point
-$g_uuid = file_get_contents("/etc/machine-id");
-$g_uuid = trim($g_uuid);
 
 
 function debug($t)
@@ -101,14 +103,13 @@ function getResultData($result)
 
 function sendHello()
 {
-    global $g_uuid;
-    global $g_host;
-    global $g_api;
+    global $globalParams;
 
-    $params["device"] = $g_uuid;
+
+    $params["device"] = $globalParams["uuid"];
     $params["ipaddress"] = getLocalIP();
 
-    $url = "https://{$g_host}/{$g_api}?r=hello";
+    $url = "https://{$globalParams["host"]}/{$globalParams["api"]}?r=hello";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -129,11 +130,10 @@ function sendHello()
 
 function getHostLastSerial()
 {
-    global $g_uuid;
-    global $g_host;
-    global $g_api;
+    global $globalParams;
+    global $globalParams["uuid"];
 
-    $url = "https://{$g_host}/{$g_api}?r=lastserial/{$g_uuid}";
+    $url = "https://{$globalParams["host"]}/{$globalParams["api"]}?r=lastserial/{$globalParams["uuid"]}";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -142,7 +142,7 @@ function getHostLastSerial()
 
     $result = curl_exec($ch);
     $data = getResultData($result);
-    
+
     if ($data !== false)
     {
         if (isset($data["lastserial"]) )
@@ -178,9 +178,7 @@ function deleteUpTo($last)
 
 function sendBunch()
 {
-    global $g_uuid;
-    global $g_host;
-    global $g_api;
+    global $globalParams;
     global $alllocs;
 
     $params=array();
@@ -195,10 +193,10 @@ function sendBunch()
             break;
     }
 
-    $params["device"] = $g_uuid;
+    $params["device"] = $globalParams["uuid"];
     $params["entries"] = $entries;
 
-    $url = "https://{$g_host}/{$g_api}?r=bunch";
+    $url = "https://{$globalParams["host"]}/{$globalParams["api"]}?r=bunch";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -224,11 +222,11 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
     global $g_last_ts;
     global $g_last_lat;
     global $g_last_lon;
-    global $g_max_speed;
-    global $g_min_distance;
-
+    global $globalParams;
     $ret = false;
 
+    if (!pointInBox($v["a"],$v["b"]),$globalParams["box"])
+        return false;
     if (array_search($v["t"],$allts) === false)
     {
 
@@ -236,10 +234,10 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
 
         $dist = DistKM($g_last_lat,$g_last_lon,$v["a"],$v["b"]);
         $speed = ($dist / ($v["t"] - $g_last_ts)) * 3600.0;
-        if ($speed < $g_max_speed)
+        if ($speed < $globalParams["max_speed"])
         {
 
-            if ($v["t"] > $g_last_ts + (15*60) || $dist > $g_min_distance || $ignoreTrace)
+            if ($v["t"] > $g_last_ts + (15*60) || $dist > $globalParams["min_distance"] || $ignoreTrace)
             {
                 $allts[] = $v["t"];
                 $alllocs[$v["s"]] = $v;
@@ -324,6 +322,12 @@ function recoverFromfile($last_serial)
     return $seq;
 }
 
+function pointInBox($lat,$lon,$box)
+{
+    if ($lat < $box["minlat"] || $lat > $box["maxlat"] || $lon < $box["minlon"] || $lon > $box["maxlon"] )
+        return false;
+    return true;
+}
 
 /*****************************************
  * Start
@@ -335,19 +339,28 @@ function recoverFromfile($last_serial)
 $config = parse_ini_file("/etc/GPS/GPS.conf");
 
 if ($config["hostname"])
-    $g_host = $config["hostname"];
+    $globalParams["host"] = $config["hostname"];
 if ($config["api"])
-    $g_api = $config["api"];
+    $globalParams["api"] = $config["api"];
 if ($config["maxspeed"])
-    $g_max_speed = floatval($config["maxspeed"]);
+    $globalParams["max_speed"] = floatval($config["maxspeed"]);
 if ($config["mindist"])
-    $g_min_distance=floatval($config["mindist"]) / 1000.0;
+    $globalParams["min_distance"]=floatval($config["mindist"]) / 1000.0;
+if ($config["boxlatmin"])
+    $globalParams["box"]['minlat']=floatval($config["boxlatmin"]);
+if ($config["boxlatmax"])
+    $globalParams["box"]['maxlat']=floatval($config["boxlatmax"]);
+if ($config["boxlonmin"])
+    $globalParams["box"]['minlon']=floatval($config["boxlonmin"]);
+if ($config["boxlonmaz"])
+    $globalParams["box"]['maxlon']=floatval($config["boxlonmaz"]);
 
 echo "Start - configuration details:\n";
-echo " host - {$g_host}\n";
-echo " api - {$g_api}\n";
-echo " maxspeed - {$g_max_speed}\n";
-echo " mindist - {$g_min_distance}\n";
+echo " host - {$globalParams["host"]}\n";
+echo " api - {$globalParams["api"]}\n";
+echo " maxspeed - {$globalParams["max_speed"]}\n";
+echo " mindist - {$globalParams["min_distance"]}\n";
+echo " box - {$globalParams["box"]['minlat']},{$globalParams["box"]['minon']} - {$globalParams["box"]['maxlat']},{$globalParams["box"]['maxlon']}\n";
 
 sendHello();
 
