@@ -21,12 +21,12 @@ $last_values["ts"] = 0;
 $last_values["lat"] = 0;
 $last_values["lon"] = 0;
 $last_values["serial"] = 0;
+$last_values["hello"] = false;
 
 $g_strdate = "";
 
 $alllocs = array();
 $allts = array();
-
 
 function debug($t)
 {
@@ -127,14 +127,15 @@ function sendHello()
     curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
 
     $result = curl_exec($ch);
-    $data = getResultData($result);
-    if ($data !== false)
+    if ($result)
     {
-        if (isset($data["lastserial"]) )
-            return intval($data["lastserial"]);
+        $result = json_decode($result,true);
+        if (isset($result["meta"]) && isset($result["meta"] ["status"]) && $result["meta"] ["status"])
+        {
+            return true;
+        }
     }
     return false;
-
 }
 
 function getHostLastSerial()
@@ -187,37 +188,58 @@ function deleteUpTo($last)
 function sendBunch()
 {
     global $globalParams;
+    global $last_values;
     global $alllocs;
 
     $params=array();
     $entries = array();
 
     $cnt = 0;
-    foreach($alllocs as $idx => $loc)
+
+    //Have we sent a hello yet?
+    if (! $last_values["hello"] )
     {
-        $entries[$idx] = $loc;
-        $cnt++;
-        if ($cnt > 50)
-            break;
+        $last_values["hello"] = sendHello();
+        $v = getHostLastSerial();
+        if ($v)
+        {
+            $last_values["host_serial"] = $v;
+            echo "Recovering from file\n";
+            $last_values["serial"] = recoverFromfile($last_values["host_serial"]);
+            $last_values["serial"]++;
+            echo "Recovered from file next serial is {$last_values["serial"]}\n";
+            return false;
+        }
     }
 
-    $params["device"] = $globalParams["uuid"];
-    $params["entries"] = $entries;
-
-    $url = "https://{$globalParams["host"]}/{$globalParams["api"]}?r=bunch";
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($params));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
-
-    $result = curl_exec($ch);
-    $data = getResultData($result);
-    if ($data !== false)
+    if ($last_values["hello"])
     {
-        if (isset($data["lastserial"]) )
-            return intval($data["lastserial"]);
+        foreach($alllocs as $idx => $loc)
+        {
+            $entries[$idx] = $loc;
+            $cnt++;
+            if ($cnt > 50)
+                break;
+        }
+
+        $params["device"] = $globalParams["uuid"];
+        $params["entries"] = $entries;
+
+        $url = "https://{$globalParams["host"]}/{$globalParams["api"]}?r=bunch";
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($params));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+
+        $result = curl_exec($ch);
+        $data = getResultData($result);
+        if ($data !== false)
+        {
+            if (isset($data["lastserial"]) )
+                return intval($data["lastserial"]);
+        }
     }
     return false;
 }
@@ -363,12 +385,14 @@ echo " maxspeed - {$globalParams["max_speed"]}\n";
 echo " mindist - {$globalParams["min_distance"]}\n";
 echo " box - {$globalParams["box"]['minlat']},{$globalParams["box"]['minlon']} - {$globalParams["box"]['maxlat']},{$globalParams["box"]['maxlon']}\n";
 
-sendHello();
+$last_values["hello"] = sendHello();
 
-$v = getHostLastSerial();
-if ($v)
-    $last_values["host_serial"] = $v;
-
+if ($last_values["hello"])
+{
+    $v = getHostLastSerial();
+    if ($v)
+        $last_values["host_serial"] = $v;
+}
 
 $strTraceFile = "/var/GPS/TrackData.txt";
 
