@@ -45,6 +45,13 @@ function debug_var_dump($a,$t="")
     }
 }
 
+function pointInBox($lat,$lon,$box)
+{
+    if ($lat < $box["minlat"] || $lat > $box["maxlat"] || $lon < $box["minlon"] || $lon > $box["maxlon"] )
+        return false;
+    return true;
+}
+
 function DistKM($lat,$long,$dlat,$dlong)
 {
     $toRadians = (3.14159265358979 / 180.0);
@@ -226,7 +233,7 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
 
     $ret = false;
 
-    if (!pointInBox($v["a"],$v["b"]),$globalParams["box"])
+    if ( ! pointInBox($v["a"],$v["b"]),$globalParams["box"]) )
         return false;
     if (array_search($v["t"],$allts) === false)
     {
@@ -321,13 +328,6 @@ function recoverFromfile($last_serial)
     }
 
     return $seq;
-}
-
-function pointInBox($lat,$lon,$box)
-{
-    if ($lat < $box["minlat"] || $lat > $box["maxlat"] || $lon < $box["minlon"] || $lon > $box["maxlon"] )
-        return false;
-    return true;
 }
 
 /*****************************************
