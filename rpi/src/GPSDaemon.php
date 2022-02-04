@@ -14,13 +14,15 @@ $globalParams["host"] = "track.devt.nz";
 $globalParams["api"] = "myTrackApi.php";
 $globalParams["uuid"] = trim(file_get_contents("/etc/machine-id"));
 
+//Lastloc
+$last_values=array();
+$last_values["host_serial"] = -1;
+$last_values["ts"] = 0;
+$last_values["lat"] = 0;
+$last_values["lon"] = 0;
+$last_values["serial"] = 0;
 
-$serial = 0;
 $g_strdate = "";
-$g_last_serial = -1;
-$g_last_ts = 0;
-$g_last_lat = 0;
-$g_last_lon = 0;
 
 $alllocs = array();
 $allts = array();
@@ -131,7 +133,6 @@ function sendHello()
 function getHostLastSerial()
 {
     global $globalParams;
-    global $globalParams["uuid"];
 
     $url = "https://{$globalParams["host"]}/{$globalParams["api"]}?r=lastserial/{$globalParams["uuid"]}";
     $ch = curl_init($url);
@@ -219,10 +220,10 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
     global $allts;
     global $alllocs;
     global $ftrace;
-    global $g_last_ts;
-    global $g_last_lat;
-    global $g_last_lon;
+
     global $globalParams;
+    global $last_values;
+
     $ret = false;
 
     if (!pointInBox($v["a"],$v["b"]),$globalParams["box"])
@@ -232,28 +233,28 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
 
         //Now check that the distance is more than 50 metres and time from last is greater than 15 minutes
 
-        $dist = DistKM($g_last_lat,$g_last_lon,$v["a"],$v["b"]);
-        $speed = ($dist / ($v["t"] - $g_last_ts)) * 3600.0;
+        $dist = DistKM($last_values["lat"],$last_values["lon"],$v["a"],$v["b"]);
+        $speed = ($dist / ($v["t"] - $last_values["ts"])) * 3600.0;
         if ($speed < $globalParams["max_speed"])
         {
 
-            if ($v["t"] > $g_last_ts + (15*60) || $dist > $globalParams["min_distance"] || $ignoreTrace)
+            if ($v["t"] > $last_values["ts"] + (15*60) || $dist > $globalParams["min_distance"] || $ignoreTrace)
             {
                 $allts[] = $v["t"];
                 $alllocs[$v["s"]] = $v;
                 if (! $ignoreTrace)
                 {
                     fwrite($ftrace,"{$v["s"]},{$v["t"]},{$v["a"]},{$v["b"]},{$v["c"]},{$v["h"]}\n");
-                    $g_last_ts = $v["t"];
-                    $g_last_lat = $v["a"];
-                    $g_last_lon = $v["b"];
+                    $last_values["ts"] = $v["t"];
+                    $last_values["lat"] = $v["a"];
+                    $last_values["lon"] = $v["b"];
                 }
                 $ret = true;
             }
         }
 
         if ($speed > 500 && $sentence)
-            error_log("Invalid GPS data - speed too high {$speed}km/hr, decoded lat/lon {$v["a"]}/{$v["b"]} last lat/lon {$g_last_lat}/{$g_last_lon} offending sentence is {$sentence}");
+            error_log("Invalid GPS data - speed too high {$speed}km/hr, decoded lat/lon {$v["a"]}/{$v["b"]} last lat/lon {$last_values["lat"]}/{$last_values["lon"]} offending sentence is {$sentence}");
         if (!$ignoreSend)
         {
             if (count($alllocs) > 0)
@@ -262,8 +263,8 @@ function post($v,$ignoreSend=false,$ignoreTrace=false,$sentence=null)
 
                 if ($rslt !== false)
                 {
-                    $g_last_serial = $rslt;
-                    deleteUpTo($g_last_serial);
+                    $last_values["host_serial"] = $rslt;
+                    deleteUpTo($rslt);
                 }
             }
         }
@@ -366,10 +367,7 @@ sendHello();
 
 $v = getHostLastSerial();
 if ($v)
-{
-    $g_last_serial = $v;
-    $g_last_serial++;
-}
+    $last_values["host_serial"] = $v;
 
 
 $strTraceFile = "/var/GPS/TrackData.txt";
@@ -404,21 +402,21 @@ else
         $tok = strtok($lastline,",");
         debug("Tok {$tok}");
 
-        $serial = intval(strtok($lastline,","));
+        $last_values["serial"] = intval(strtok($lastline,","));
 
-        if ($serial > 0)
-            $serial++;
+        if ($last_values["serial"] > 0)
+            $last_values["serial"]++;
     }
     fclose($f1);
 
     echo "Recovering from file\n";
-    $serial = recoverFromfile($g_last_serial);
-    $serial++;
-    echo "Recovered from file next serial is {$serial}\n";
+    $last_values["serial"] = recoverFromfile($last_values["host_serial"]);
+    $last_values["serial"]++;
+    echo "Recovered from file next serial is {$last_values["serial"]}\n";
 }
 
 
-echo "Starting GPS logger with serial {$serial}\n";
+echo "Starting GPS logger with serial {$last_values["serial"]}\n";
 
 $ftrace = fopen($strTraceFile,"a");
 
@@ -437,9 +435,9 @@ if ($f)
                 if ($v["type"] == "GNGGA")
                 {
                     unset($v["type"]);
-                    $v["s"] = $serial;
+                    $v["s"] = $last_values["serial"];
                     if (post($v,false,false,$s) )
-                        $serial++;
+                        $last_values["serial"]++;
                 }
             }
         }
