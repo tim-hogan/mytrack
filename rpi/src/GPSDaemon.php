@@ -361,7 +361,7 @@ echo " host - {$globalParams["host"]}\n";
 echo " api - {$globalParams["api"]}\n";
 echo " maxspeed - {$globalParams["max_speed"]}\n";
 echo " mindist - {$globalParams["min_distance"]}\n";
-echo " box - {$globalParams["box"]['minlat']},{$globalParams["box"]['minon']} - {$globalParams["box"]['maxlat']},{$globalParams["box"]['maxlon']}\n";
+echo " box - {$globalParams["box"]['minlat']},{$globalParams["box"]['minlon']} - {$globalParams["box"]['maxlat']},{$globalParams["box"]['maxlon']}\n";
 
 sendHello();
 
