@@ -9,12 +9,12 @@ class SyncList
     private $_list;
     private $_emptyFile;
 
-    function __construct($strAuditFile)
+    function __construct($strAuditFile,$start_seq=0)
     {
         $this->_strAuditFile = $strAuditFile;
         $this->_fHandle = null;
         $this->_list = array();
-        $this->_seq = 0;
+        $this->_seq = $start_seq;
         $this->_emptyFile = false;
 
         if (file_exists($strAuditFile) )
@@ -42,9 +42,10 @@ class SyncList
 
     private function recoverFromAudit()
     {
-        $maxseq = 0;
+        $maxseq = -1;
         $hdr = array();
         $line = "";
+        $seq = -1;
 
         $f = fopen( $this->_strAuditFile,"r");
         while (($data = fgetcsv($f, 1000, ",")) !== FALSE)

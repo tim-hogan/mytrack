@@ -124,13 +124,12 @@ function storeBunch($req,$params)
 
     $entries = $params["entries"];
 
-    $n = count($entries);
-
     foreach ($entries as $e)
     {
         if ( $DB->createLoc($uuid,$e) )
             $completed[] = intval($e["s"]);
     }
+
 
     $data["completed"] = $completed;
 
