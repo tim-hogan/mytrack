@@ -19,6 +19,7 @@ $last_values["lon"] = 0;
 $last_values["serial"] = 0;
 $last_values["hello"] = false;
 $last_values["maxts"] = 0;
+$last_values['allts'] = array();  //List of the last time stamps deleted if older than last ts and 600 seconds
 
 $g_strdate = "";
 
@@ -253,12 +254,17 @@ function checkRequired($v,$synclist)
         echo "check required retuned false speed too fast {$speed}\n";
         return false;
     }
+
+    $allts = $last_values['allts'];
+
+
     if ($v["t"] > $last_values["ts"] + (15*60) || $dist > $globalParams["min_distance"] )
     {
         $last_values["ts"] = $v["t"];
         $last_values["maxts"] = max($v["t"],$last_values["maxts"] ) ;
         $last_values["lat"] = $v["a"];
         $last_values["lon"] = $v["b"];
+        $last_values['allts'] [] = $v["t"];
         return true;
     }
 
@@ -296,13 +302,15 @@ function parseOptions($filename)
  * Parse the options at start
  *****************************************
 */
+
+sleep(300);  //Wait for networks and clock to come up.
+
 $globalParams = parseOptions("/etc/GPS/GPS.conf");
 echo "Start - configuration details:\n";
 echo " uuid - {$globalParams["uuid"]}; host - {$globalParams["host"]}; api - {$globalParams["api"]}\n";
 echo " maxspeed - {$globalParams["max_speed"]}; mindist - {$globalParams["min_distance"]}\n";
 echo " box  [{$globalParams["box"]['minlat']},{$globalParams["box"]['minlon']}] - [{$globalParams["box"]['maxlat']},{$globalParams["box"]['maxlon']}]\n";
 
-sleep(45);  //Wait for networks and clock to come up.
 
 $last_values["hello"] = sendHello();
 
@@ -357,7 +365,6 @@ if ($f)
             $num_locs = $synclist->count();
             if ($num_locs > 0)
             {
-                echo " sending to host bunch of locs count in queue is {$num_locs}\n";
                 $rsltList = sendBunch($synclist);
                 foreach($rsltList as $seq)
                 {

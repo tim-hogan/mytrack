@@ -1,5 +1,6 @@
 <?php
 namespace devt\SyncList;
+use DateTime;
 
 class SyncList
 {
@@ -46,6 +47,10 @@ class SyncList
         $hdr = array();
         $line = "";
         $seq = -1;
+
+        //Make a copy of the file
+        $strDT = (new DateTime())->format("YmdHis");
+        copy($this->_strAuditFile,$this->_strAuditFile . "save-$strDT");
 
         $f = fopen( $this->_strAuditFile,"r");
         while (($data = fgetcsv($f, 1000, ",")) !== FALSE)

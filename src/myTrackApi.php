@@ -143,6 +143,7 @@ function storeBunch($req,$params)
     $ret = array();
     $ret['meta'] = newOKMetaHdr($req);
     $ret['data'] = $data;
+    var_error_log($ret);
     echo json_encode($ret);
     exit();
 }

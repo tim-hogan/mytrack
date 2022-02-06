@@ -119,7 +119,7 @@ class MyTrackDB extends SQLPlus
         if ($device)
         {
             $rslt = $this->p_create("insert into loc (loc_device,loc_timestamp,loc_serial,loc_lat,loc_lon,loc_height,loc_hdop) values (?,?,?,?,?,?,?)","isidddd",$device->iddevice,$strT,$a["s"],$a["a"],$a["b"],$a["c"],$a["h"]);
-            if ($rslt || $this->errno == 1062)
+            if ($rslt || $this->lasterrno == 1062)
                 return true;
         }
         return false;
