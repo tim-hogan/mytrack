@@ -63,7 +63,8 @@ cp ../rpi/src/GPS.service			      		./bin
 cp ../rpi/src/GPSSetup.php						./bin
 
 emptyandcreate includes
-cp ../rpi/src/includes/classNMEA.php			./includes
+cp ../rpi/src/includes/classNMEA.php				./includes
+cp ../rpi/src/includes/classSyncList.php			./includes
 
 emptyandcreate scripts
 cp ../rpi/src/installAll.sh					    ./scripts

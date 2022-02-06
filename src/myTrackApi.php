@@ -84,7 +84,7 @@ function getLastSerial($req,$uuid)
     $serial = $DB->getLastLocSerial($uuid);
     if ($serial === false)
         returnError($req,1002,"No data");
-    
+
     $data["lastserial"] = $serial;
 
     $ret = array();
@@ -105,6 +105,7 @@ function storeBunch($req,$params)
     global $DB;
 
     $data = array();
+    $completed = array();
 
     $uuid = 0;
     if (isset($params["device"]))
@@ -127,8 +128,11 @@ function storeBunch($req,$params)
 
     foreach ($entries as $e)
     {
-        $DB->createLoc($uuid,$e);
+        if ( $DB->createLoc($uuid,$e) )
+            $completed[] = intval($e["s"]);
     }
+
+    $data["completed"] = $completed;
 
     $lastserial = $DB->getLastLocSerial($uuid);
     if ($lastserial === false)

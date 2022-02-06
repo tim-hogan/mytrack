@@ -133,23 +133,30 @@ class NMEA
         return $deg;
     }
 
-    static public function isDateTimeWithin($strdate,$strtime,$seconds)
+    static function getTsSerial($strdate,$strtime)
     {
-        $dtNow = new \DateTime();
         try
         {
             $dtTS = new \DateTime($strdate . " " . $strtime);
+            return $dtTS->getTimestamp();
         }
         catch (Exception $e)
         {
             return false;
         }
 
-        if (abs( $dtNow->getTimestamp() - $dtTS->getTimestamp() ) < $seconds)
-                return $dtTS->getTimestamp();
+    }
 
+    static public function isDateTimeWithin($strdate,$strtime,$seconds)
+    {
+        $dtNow = new \DateTime();
+        $dtTS = getTsSerial($strdate,$strtime);
+
+        if ( $dtTS !== false && abs( $dtNow->getTimestamp() - $dtTS->getTimestamp() ) < $seconds)
+                return $dtTS->getTimestamp();
         return false;
     }
+
 
     static public function decodeSentence($sentence,&$strdate)
     {
@@ -168,7 +175,7 @@ class NMEA
                 $ts = self::decodeTime($fields[1]);
                 $strtime = $ts[0];
                 $timemilli = $ts[1];
-                $dtSerial = self::isDateTimeWithin($strdate,$strtime,300);
+                $dtSerial = self::getTsSerial($strdate,$strtime);
                 if (!$dtSerial)
                     return false;
                 $lat = self::decodeLat($fields[3],$fields[4]);
@@ -187,9 +194,7 @@ class NMEA
                 $ts = self::decodeTime($fields[1]);
                 $strtime = $ts[0];
                 $timemilli = $ts[1];
-
-                $dtSerial = self::isDateTimeWithin($strdate,$strtime,10000000);
-                //$dtSerial = self::isDateTimeWithin($strdate,$strtime,300);
+                $dtSerial = self::getTsSerial($strdate,$strtime);
                 if (!$dtSerial)
                     return false;
                 $lat = self::decodeLat($fields[2],$fields[3]);

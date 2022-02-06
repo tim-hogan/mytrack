@@ -91,6 +91,7 @@ cp ${DIR}/tmpfiles/bin/GPSSetup.php /etc/GPS/GPSSetup.php
 
 mkdir -p /etc/GPS/includes
 cp ${DIR}/tmpfiles/includes/classNMEA.php /etc/GPS/includes/classNMEA.php
+cp ${DIR}/tmpfiles/includes/classSyncList.php /etc/GPS/includes/classSyncList.php
 
 chmod +x /etc/GPS/GPSDaemon.php
 

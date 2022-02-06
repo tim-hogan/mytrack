@@ -118,7 +118,9 @@ class MyTrackDB extends SQLPlus
         $strT = $dt->format("Y-m-d H:i:s");
         if ($device)
         {
-            return $this->p_create("insert into loc (loc_device,loc_timestamp,loc_serial,loc_lat,loc_lon,loc_height,loc_hdop) values (?,?,?,?,?,?,?)","isidddd",$device->iddevice,$strT,$a["s"],$a["a"],$a["b"],$a["c"],$a["h"]);
+            $rslt = $this->p_create("insert into loc (loc_device,loc_timestamp,loc_serial,loc_lat,loc_lon,loc_height,loc_hdop) values (?,?,?,?,?,?,?)","isidddd",$device->iddevice,$strT,$a["s"],$a["a"],$a["b"],$a["c"],$a["h"]);
+            if ($rslt || $this->errno == 1062)
+                return true;
         }
         return false;
     }
