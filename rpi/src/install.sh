@@ -108,7 +108,7 @@ echo "[source]
 api=myTrackApi.php
 hostname=track.devt.nz
 maxspeed=500
-mindist=50
+mindist=10
 boxlatmin=-47.4
 boxlatmax=-34.0
 boxlonmin=166.0

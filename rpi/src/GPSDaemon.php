@@ -7,6 +7,9 @@ use devt\SyncList\SyncList;
 
 define("__DEBUG__",false);
 
+//This is a deamon so set no time limit
+set_time_limit(0);
+
 //Globals
 $globalParams= null;
 
@@ -40,6 +43,35 @@ function debug_var_dump($a,$t="")
     {
         echo $t . "\n";
         var_dump($a);
+    }
+}
+
+function Led($action,$colour="red",$rate=2,$duration=5000,$ratio=0.5)
+{
+    $command = array();
+    $command["action"] = $action;
+    $command["colour"] = $colour;
+    $command["rate"] = $rate;
+    $command["duration"] = $duration;
+    $command["ratio"] = $ratio;
+
+    $str_json = json_encode($command);
+
+    try
+    {
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if ($socket)
+        {
+            if (socket_connect($socket, "127.0.0.1", 2207) )
+            {
+                @socket_write($socket, $str_json, strlen($str_json));
+                socket_close($socket);
+            }
+        }
+    }
+    catch (Exception $e)
+    {
+
     }
 }
 
@@ -133,6 +165,7 @@ function sendHello()
         if (isset($result["meta"]) && isset($result["meta"] ["status"]) && $result["meta"] ["status"])
         {
             echo " host sent good rstl\n";
+            Led("blink","blue",0.5,0,0.01);
             return true;
         }
     }
@@ -302,6 +335,7 @@ function parseOptions($filename)
  * Parse the options at start
  *****************************************
 */
+Led("blink","red",0.5,0,0.01);
 
 sleep(300);  //Wait for networks and clock to come up.
 

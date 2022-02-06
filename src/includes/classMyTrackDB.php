@@ -111,6 +111,12 @@ class MyTrackDB extends SQLPlus
         return false;
     }
 
+    public function haveLocFor($iddevice,$strTime)
+    {
+        $a = $this->o_singlequery("loc","select * from loc where loc_device = ? and loc_timestamp = ?","is",$iddevice,$strTime);
+        return ($a) ? true : false;
+    }
+
     public function createLoc($uuid,$a)
     {
         $device = $this->getDeviceByUUID($uuid);
@@ -118,9 +124,13 @@ class MyTrackDB extends SQLPlus
         $strT = $dt->format("Y-m-d H:i:s");
         if ($device)
         {
-            $rslt = $this->p_create("insert into loc (loc_device,loc_timestamp,loc_serial,loc_lat,loc_lon,loc_height,loc_hdop) values (?,?,?,?,?,?,?)","isidddd",$device->iddevice,$strT,$a["s"],$a["a"],$a["b"],$a["c"],$a["h"]);
-            if ($rslt || $this->lasterrno == 1062)
-                return true;
+            //Do we already have a lov
+            if (! $this->haveLocFor($device->iddevice,$strT) )
+            {
+                $rslt = $this->p_create("insert into loc (loc_device,loc_timestamp,loc_serial,loc_lat,loc_lon,loc_height,loc_hdop) values (?,?,?,?,?,?,?)","isidddd",$device->iddevice,$strT,$a["s"],$a["a"],$a["b"],$a["c"],$a["h"]);
+                if ($rslt || $this->lasterrno == 1062)
+                    return true;
+            }
         }
         return false;
     }
