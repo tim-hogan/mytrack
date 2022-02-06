@@ -165,7 +165,7 @@ function sendHello()
         if (isset($result["meta"]) && isset($result["meta"] ["status"]) && $result["meta"] ["status"])
         {
             echo " host sent good rstl\n";
-            Led("blink","blue",0.5,0,0.01);
+            Led("blink","magenta",0.5,0,0.01);
             return true;
         }
     }
@@ -261,20 +261,11 @@ function checkRequired($v,$synclist)
     global $last_values;
 
     if ( ! pointInBox($v["a"],$v["b"],$globalParams["box"]) )
-    {
-        echo "check required retuned false not in box\n";
         return false;
-    }
     if ($synclist->inList("t",$v["t"]))
-    {
-        echo "check required retuned false timestamp already in list\n";
         return false;
-    }
     if ( $v["t"] < ($last_values["maxts"] - 300) )
-    {
-        echo "check required retuned false timestamp less than maximium ts - 300 seconds\n";
         return false;
-    }
 
     $speed = 0.0;
     $dist = DistKM($last_values["lat"],$last_values["lon"],$v["a"],$v["b"]);
@@ -283,10 +274,7 @@ function checkRequired($v,$synclist)
         $speed = ($dist / $divisor) * 3600.0;
 
     if ($speed > $globalParams["max_speed"])
-    {
-        echo "check required retuned false speed too fast {$speed}\n";
         return false;
-    }
 
     $allts = $last_values['allts'];
 
@@ -382,10 +370,16 @@ if ($f)
                         if ($synclist->count() > 0)
                         {
                             $rsltList = sendBunch($synclist);
-                            foreach($rsltList as $seq)
+                            if ($rsltList !== false && count($rsltList) > 0)
                             {
-                                $synclist->remove($seq);
+                                Led("blink","green",0.5,0,0.01);
+                                foreach($rsltList as $seq)
+                                {
+                                    $synclist->remove($seq);
+                                }
                             }
+                            else
+                                Led("blink","blue",0.5,0,0.01);
                         }
                     }
                 }
