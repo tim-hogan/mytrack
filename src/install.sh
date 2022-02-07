@@ -294,5 +294,5 @@ Header always set Strict-Transport-Security \"max-age=63072000; includeSubdomain
     systemctl reload apache2
 fi
 
-echo -e "${GREEN}Completed install of covidpass solution${NC}"
+echo -e "${GREEN}Completed install of mytrack solution${NC}"
 exit 0
