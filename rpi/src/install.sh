@@ -100,6 +100,10 @@ mkdir -p /etc/led
 cp ${DIR}/tmpfiles/led/LedDaemon.php /etc/led/LedDaemon.php
 chmod +x /etc/led/LedDaemon.php
 
+mkdir -p /etc/led/includes
+cp ${DIR}/tmpfiles/led/includes/classGPIO.php /etc/led/includes/classGPIO.php
+cp ${DIR}/tmpfiles/led/includes/classGPIOLED.php /etc/led/includes/classGPIOLED.php
+
 mkdir -p /var/GPS
 chmod 777 /var/GPS
 

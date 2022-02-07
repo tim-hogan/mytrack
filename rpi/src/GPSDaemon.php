@@ -25,9 +25,8 @@ $last_values["maxts"] = 0;
 $last_values['allts'] = array();  //List of the last time stamps deleted if older than last ts and 600 seconds
 
 $g_strdate = "";
+$ftrace = null;
 
-$alllocs = array();
-$allts = array();
 
 function debug($t)
 {
@@ -48,6 +47,8 @@ function debug_var_dump($a,$t="")
 
 function traceTime($v)
 {
+    global $ftrace;
+
     if (! $ftrace)
         $ftrace = fopen("/var/GPS/TraceGGA.txt","a");
     if ($ftrace)

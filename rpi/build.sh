@@ -71,6 +71,11 @@ emptyandcreate led
 cp ../../../devt/led/LedDaemon.php                          ./led
 cp ../../../devt/led/LedDaemon.service                      ./led
 
+emptyandcreate led/includes
+cp ../../../devt/classes/classGPIOLED.php                   ./led/includes
+cp ../../../devt/classes/classGPIO.php                      ./led/includes
+
+
 emptyandcreate scripts
 cp ../rpi/src/installAll.sh					    ./scripts
 

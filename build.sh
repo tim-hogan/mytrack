@@ -92,12 +92,12 @@ if ! $INGNOREGIT ; then
     git pull devt $BRANCH
     cd -
 
-    echo -e "Getting covidpass from GitHub"
+    echo -e "Getting mytrack from GitHub"
     rm -fr .git
     rm -fr *
     git init
     git remote add mytrack git@github.com:tim-hogan/mytrack.git
-    git pull covidpass $BRANCH
+    git pull mytrack $BRANCH
 
     . version
     OLDVERSION=${VERSION}
