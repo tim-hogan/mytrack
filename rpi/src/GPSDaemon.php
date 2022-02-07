@@ -269,11 +269,12 @@ function checkRequired($v,$synclist)
     global $globalParams;
     global $last_values;
 
+    //Check that this is a newer time stamp
+    if ($v["t"] < $last_values["maxts"])
+        return false;
     if ( ! pointInBox($v["a"],$v["b"],$globalParams["box"]) )
         return false;
     if ($synclist->inList("t",$v["t"]))
-        return false;
-    if ( $v["t"] < ($last_values["maxts"] - 300) )
         return false;
 
     $speed = 0.0;
@@ -285,18 +286,12 @@ function checkRequired($v,$synclist)
     if ($speed > $globalParams["max_speed"])
         return false;
 
-    $allts = $last_values['allts'];
-
-
     if ($v["t"] > $last_values["ts"] + (15*60) || $dist > $globalParams["min_distance"] )
     {
         $last_values["ts"] = $v["t"];
-        if ($v["t"] > $last_values["maxts"])
-        {
-            $last_values["maxts"] = $v["t"];
-            $last_values["lat"] = $v["a"];
-            $last_values["lon"] = $v["b"];
-        }
+        $last_values["maxts"] = $v["t"];
+        $last_values["lat"] = $v["a"];
+        $last_values["lon"] = $v["b"];
         $last_values['allts'] [] = $v["t"];
         return true;
     }
