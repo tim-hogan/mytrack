@@ -121,6 +121,9 @@ echo -e "${GREEN}****************${NC}"
 echo -e "${GREEN}* Build start  *${NC}"
 echo -e "${GREEN}****************${NC}"
 
+echo -e "${YELLOW}Waiting 60 seconds${NC}"
+sleep 60
+
 #create the install directory
 emptyandcreate install
 
