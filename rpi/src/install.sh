@@ -140,7 +140,7 @@ systemctl start LedDaemon
 systemctl enable LedDaemon
 systemctl status LedDaemon
 
-sleep(5)
+sleep 5
 
 systemctl start GPS
 systemctl enable GPS

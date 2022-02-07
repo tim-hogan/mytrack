@@ -291,9 +291,12 @@ function checkRequired($v,$synclist)
     if ($v["t"] > $last_values["ts"] + (15*60) || $dist > $globalParams["min_distance"] )
     {
         $last_values["ts"] = $v["t"];
-        $last_values["maxts"] = max($v["t"],$last_values["maxts"] ) ;
-        $last_values["lat"] = $v["a"];
-        $last_values["lon"] = $v["b"];
+        if ($v["t"] > $last_values["maxts"])
+        {
+            $last_values["maxts"] = $v["t"];
+            $last_values["lat"] = $v["a"];
+            $last_values["lon"] = $v["b"];
+        }
         $last_values['allts'] [] = $v["t"];
         return true;
     }
