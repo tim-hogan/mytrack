@@ -46,6 +46,14 @@ function debug_var_dump($a,$t="")
     }
 }
 
+function traceTime($v)
+{
+    if (! $ftrace)
+        $ftrace = fopen("/var/GPS/TraceGGA.txt","a");
+    if ($ftrace)
+        fwrite($ftrace,strval($v["t"]) . "," . strval($v["a"]) . "," . strval($v["b"])"\n");
+}
+
 function Led($action,$colour="red",$rate=2,$duration=5000,$ratio=0.5)
 {
     $command = array();
@@ -325,7 +333,7 @@ function parseOptions($filename)
 */
 Led("blink","red",0.5,0,0.01);
 
-sleep(300);  //Wait for networks and clock to come up.
+sleep(30);  //Wait for networks and clock to come up.
 
 $globalParams = parseOptions("/etc/GPS/GPS.conf");
 echo "Start - configuration details:\n";
@@ -344,12 +352,13 @@ if ($last_values["hello"])
 }
 $start_serial = $last_values["host_serial"] + 1;
 
+$strttyfile = "/dev/ttyS0";
 $strTraceFile = "/var/GPS/TrackData.txt";
 $synclist = new SyncList($strTraceFile,$start_serial);
 
 echo "Starting GPS logger with serial {$start_serial}\n";
 $loop_counter = 0;
-$f = fopen("/dev/ttyS0","w+");
+$f = fopen($strttyfile,"w+");
 
 if ($f)
 {
@@ -364,6 +373,7 @@ if ($f)
                 if ($v["type"] == "GNGGA")
                 {
                     unset($v["type"]);
+                    traceTime($v);
                     if (checkRequired($v,$synclist))
                     {
                         $synclist->insert($v);
@@ -402,8 +412,8 @@ if ($f)
         }
         $loop_counter++;
     }
-    debug("End of file");
+    echo "End of file received from {$strttyfile}\n";
 }
 else
-    debug("Could not open file");
+    echo "Could not open file {$strttyfile}\n";
 ?>

@@ -114,7 +114,9 @@ class MyTrackDB extends SQLPlus
     public function haveLocFor($iddevice,$strTime)
     {
         $a = $this->o_singlequery("loc","select * from loc where loc_device = ? and loc_timestamp = ?","is",$iddevice,$strTime);
-        return ($a) ? true : false;
+        if ($a)
+            return true;
+        return false;
     }
 
     public function createLoc($uuid,$a)
@@ -131,6 +133,8 @@ class MyTrackDB extends SQLPlus
                 if ($rslt || $this->lasterrno == 1062)
                     return true;
             }
+            else
+                return true;
         }
         return false;
     }
