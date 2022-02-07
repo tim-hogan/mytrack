@@ -51,7 +51,7 @@ function traceTime($v)
     if (! $ftrace)
         $ftrace = fopen("/var/GPS/TraceGGA.txt","a");
     if ($ftrace)
-        fwrite($ftrace,strval($v["t"]) . "," . strval($v["a"]) . "," . strval($v["b"])"\n");
+        fwrite($ftrace,strval($v["t"]) . "," . strval($v["a"]) . "," . strval($v["b"]) . "\n");
 }
 
 function Led($action,$colour="red",$rate=2,$duration=5000,$ratio=0.5)
