@@ -70,7 +70,7 @@ function Led($action,$colour="red",$rate=2,$duration=5000,$ratio=0.5)
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket)
         {
-            if (socket_connect($socket, "127.0.0.1", 2207) )
+            if (@socket_connect($socket, "127.0.0.1", 2207) )
             {
                 @socket_write($socket, $str_json, strlen($str_json));
                 socket_close($socket);
