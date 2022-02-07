@@ -66,6 +66,11 @@ emptyandcreate includes
 cp ../rpi/src/includes/classNMEA.php				./includes
 cp ../rpi/src/includes/classSyncList.php			./includes
 
+#led daemon
+emptyandcreate led
+cp ../../../devt/led/LedDaemon.php                          ./led
+cp ../../../devt/led/LedDaemon.service                      ./led
+
 emptyandcreate scripts
 cp ../rpi/src/installAll.sh					    ./scripts
 

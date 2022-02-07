@@ -95,6 +95,11 @@ cp ${DIR}/tmpfiles/includes/classSyncList.php /etc/GPS/includes/classSyncList.ph
 
 chmod +x /etc/GPS/GPSDaemon.php
 
+#setup the led daemon
+mkdir -p /etc/led
+cp ${DIR}/tmpfiles/led/LedDaemon.php /etc/led/LedDaemon.php
+chmod +x /etc/led/LedDaemon.php
+
 mkdir -p /var/GPS
 chmod 777 /var/GPS
 
@@ -115,12 +120,23 @@ boxlonmin=166.0
 boxlonmax=178.8
 " > /etc/GPS/GPS.conf
 
+#terminate anyof the daemons
+systemctl stop GPS
+systemctl stop LedDaemon
+
 
 #Need to copy the service file 
 cp ${DIR}/tmpfiles/bin/GPS.service /etc/systemd/system
+cp ${DIR}/tmpfiles/led/LedDaemon.service /etc/systemd/system
 
 echo "Enabling the GPS service"
 systemctl daemon-reload
+
+systemctl start LedDaemon
+systemctl enable LedDaemon
+systemctl status LedDaemon
+
+sleep(5)
 
 systemctl start GPS
 systemctl enable GPS

@@ -146,12 +146,20 @@ fi
 
 #copy webfiles
 emptyandcreate webfiles
-cp ../src/myTrackApi.php                         ./webfiles
+cp ../src/myTrackApi.php                                 ./webfiles
 
 #copy includes
 emptyandcreate webfiles/includes
-cp ../src/includes/classMyTrackDB.php      		./webfiles/includes
-cp ../src/includes/securityParams.php   		./webfiles/includes
+cp ../src/includes/classMyTrackDB.php      		        ./webfiles/includes
+cp ../src/includes/securityParams.php   		        ./webfiles/includes
+
+#shared classes
+cp ../../devt/classes/classEnvironment.php             ./webfiles/includes
+cp ../../devt/classes/classParseText.php               ./webfiles/includes
+cp ../../devt/classes/classSQLPlus2.php                ./webfiles/includes
+cp ../../devt/classes/classSecure.php                  ./webfiles/includes
+cp ../../devt/classes/classVault.php                   ./webfiles/includes
+
 
 #All files now copied, now packge it up
 tar -zcf ../install/mytrack.tar.gz .
