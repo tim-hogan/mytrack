@@ -140,7 +140,7 @@ class NMEA
             $dtTS = new \DateTime($strdate . " " . $strtime);
             return $dtTS->getTimestamp();
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             return false;
         }
