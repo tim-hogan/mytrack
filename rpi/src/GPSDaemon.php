@@ -342,9 +342,6 @@ function parseOptions($filename)
  *****************************************
 */
 led_fast_blink("red");
-
-sleep(30);  //Wait for networks and clock to come up.
-
 $globalParams = parseOptions("/etc/GPS/GPS.conf");
 echo "Start - configuration details:\n";
 echo " uuid - {$globalParams["uuid"]}; host - {$globalParams["host"]}; api - {$globalParams["api"]}\n";
