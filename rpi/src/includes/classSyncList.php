@@ -73,14 +73,14 @@ class SyncList
             {
                 $hdr = $data;
                 //If we have a specified header we need to check this is valid
-                if ($this->hdr)
+                if ($this->_hdr)
                 {
-                    for ($j=0;$j<count($this->hdr);$j++)
+                    for ($j=0;$j<count($this->_hdr);$j++)
                     {
-                        if ($hdr[$j] != $this->hdr[$j])
+                        if ($hdr[$j] != $this->_hdr[$j])
                         {
                             echo "{$this->_strAuditFile} header mistmatch, using specified header dump follows\n";
-                            for ($i=0;$i<count($this->hdr);$i++)
+                            for ($i=0;$i<count($this->_hdr);$i++)
                             {
                                 echo " Should be {$this->_hdr[$i]} is ";
                                 if (isset($hdr[$i]))
