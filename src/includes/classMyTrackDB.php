@@ -65,6 +65,11 @@ class MyTrackDB extends SQLPlus
         return $this->o_singlequery("device","SELECT * from device where device_uuid = ?","s",$uuid);
     }
 
+    public function allDevices()
+    {
+        return $this->all("select * from device");
+    }
+
     public function lastDeviceSerial()
     {
         $device = $this->o_singlequery("device","SELECT device_serial from device order by device_serial desc limit 1",null,null);
@@ -137,6 +142,11 @@ class MyTrackDB extends SQLPlus
                 return true;
         }
         return false;
+    }
+
+    function allLocsFor($id)
+    {
+        return $this->p_all("select * from loc where loc_device = ? order by loc_timestamp","i",$id);
     }
 
     //*********************************************************************

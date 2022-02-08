@@ -146,7 +146,9 @@ fi
 
 #copy webfiles
 emptyandcreate webfiles
-cp ../src/myTrackApi.php                                 ./webfiles
+cp ../src/Download.php                              ./webfiles
+cp ../src/MyTrack.php                               ./webfiles
+cp ../src/myTrackApi.php                            ./webfiles
 
 #copy includes
 emptyandcreate webfiles/includes

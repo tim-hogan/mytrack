@@ -84,6 +84,17 @@ function Led($action,$colour="red",$rate=2,$duration=5000,$ratio=0.5)
     }
 }
 
+function led_slow_blink($colour)
+{
+    Led("blink",$colour,0.25,0,0.005);
+}
+
+function led_fast_blink($colour)
+{
+    Led("blink",$colour,2.0,0,0.005);
+}
+
+
 function pointInBox($lat,$lon,$box)
 {
     if ($lat < $box["minlat"] || $lat > $box["maxlat"] || $lon < $box["minlon"] || $lon > $box["maxlon"] )
@@ -174,7 +185,7 @@ function sendHello()
         if (isset($result["meta"]) && isset($result["meta"] ["status"]) && $result["meta"] ["status"])
         {
             echo " host sent good rstl\n";
-            Led("blink","magenta",0.5,0,0.01);
+            led_fast_blink("magenta");
             return true;
         }
     }
@@ -330,7 +341,7 @@ function parseOptions($filename)
  * Parse the options at start
  *****************************************
 */
-Led("blink","red",0.5,0,0.01);
+led_fast_blink("red");
 
 sleep(30);  //Wait for networks and clock to come up.
 
@@ -381,14 +392,14 @@ if ($f)
                             $rsltList = sendBunch($synclist);
                             if ($rsltList !== false && count($rsltList) > 0)
                             {
-                                Led("blink","green",0.5,0,0.01);
+                                led_slow_blink("green");
                                 foreach($rsltList as $seq)
                                 {
                                     $synclist->remove($seq);
                                 }
                             }
                             else
-                                Led("blink","blue",0.5,0,0.01);
+                                led_slow_blink("blue");
                         }
                     }
                 }
