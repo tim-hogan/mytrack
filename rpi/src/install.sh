@@ -124,24 +124,31 @@ boxlonmin=166.0
 boxlonmax=178.8
 " > /etc/GPS/GPS.conf
 
+
 #terminate anyof the daemons
+echo "Stop GPS and LedDaemon services"
 systemctl stop GPS
 systemctl stop LedDaemon
 
+sleep 2
 
 #Need to copy the service file 
+echo "Copy GPS.service file"
 cp ${DIR}/tmpfiles/bin/GPS.service /etc/systemd/system
+echo "Copy LedDaemon.service file"
 cp ${DIR}/tmpfiles/led/LedDaemon.service /etc/systemd/system
 
-echo "Enabling the GPS service"
+echo "Reloading all daemons"
 systemctl daemon-reload
 
+echo "Enabling the LedDaemon service"
 systemctl start LedDaemon
 systemctl enable LedDaemon
 systemctl status LedDaemon
 
 sleep 5
 
+echo "Enabling the GPS service"
 systemctl start GPS
 systemctl enable GPS
 systemctl status GPS
