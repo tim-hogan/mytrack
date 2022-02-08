@@ -372,57 +372,63 @@ $f = fopen($strttyfile,"w+");
 
 if ($f)
 {
-    while (!feof($f))
+    while (true)
     {
-        $data = fgets($f);
-        foreach (NMEA::parseSentances($data) as $s)
+        while (!feof($f))
         {
-            $v = NMEA::decodeSentence($s,$g_strdate);
-            if ($v)
+            $data = fgets($f);
+            foreach (NMEA::parseSentances($data) as $s)
             {
-                if ($v["type"] == "GNGGA")
+                $v = NMEA::decodeSentence($s,$g_strdate);
+                if ($v)
                 {
-                    unset($v["type"]);
-                    traceTime($v);
-                    if (checkRequired($v,$synclist))
+                    if ($v["type"] == "GNGGA")
                     {
-                        $synclist->insert($v);
-                        if ($synclist->count() > 0)
+                        unset($v["type"]);
+                        traceTime($v);
+                        if (checkRequired($v,$synclist))
                         {
-                            $rsltList = sendBunch($synclist);
-                            if ($rsltList !== false && count($rsltList) > 0)
+                            $synclist->insert($v);
+                            if ($synclist->count() > 0)
                             {
-                                led_slow_blink("green");
-                                foreach($rsltList as $seq)
+                                $rsltList = sendBunch($synclist);
+                                if ($rsltList !== false && count($rsltList) > 0)
                                 {
-                                    $synclist->remove($seq);
+                                    led_slow_blink("green");
+                                    foreach($rsltList as $seq)
+                                    {
+                                        $synclist->remove($seq);
+                                    }
                                 }
+                                else
+                                    led_slow_blink("blue");
                             }
-                            else
-                                led_slow_blink("blue");
                         }
                     }
                 }
             }
-        }
 
-        //Check that we have a bunch to send every 200 GPS reads
-        if ($loop_counter % 1000 == 0)
-        {
-            $loop_counter = 0;
-            $num_locs = $synclist->count();
-            if ($num_locs > 0)
+            //Check that we have a bunch to send every 200 GPS reads
+            if ($loop_counter % 1000 == 0)
             {
-                $rsltList = sendBunch($synclist);
-                foreach($rsltList as $seq)
+                $loop_counter = 0;
+                $num_locs = $synclist->count();
+                if ($num_locs > 0)
                 {
-                    $synclist->remove($seq);
+                    $rsltList = sendBunch($synclist);
+                    foreach($rsltList as $seq)
+                    {
+                        $synclist->remove($seq);
+                    }
                 }
             }
+            $loop_counter++;
         }
-        $loop_counter++;
+
+        echo "End of file received from {$strttyfile}\n";
+        @fclose($f)
+        $f = fopen($strttyfile,"w+");
     }
-    echo "End of file received from {$strttyfile}\n";
 }
 else
     echo "Could not open file {$strttyfile}\n";
