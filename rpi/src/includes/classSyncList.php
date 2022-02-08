@@ -9,14 +9,16 @@ class SyncList
     private $_seq;
     private $_list;
     private $_emptyFile;
+    private $_hdr;
 
-    function __construct($strAuditFile,$start_seq=0)
+    function __construct($strAuditFile,$start_seq=0,$hdr=null)
     {
         $this->_strAuditFile = $strAuditFile;
         $this->_fHandle = null;
         $this->_list = array();
         $this->_seq = $start_seq;
         $this->_emptyFile = false;
+        $this->_hdr = $hdr;
 
         if (file_exists($strAuditFile) )
         {
@@ -58,6 +60,26 @@ class SyncList
             if (empty($hdr))
             {
                 $hdr = $data;
+                //If we have a specified header we need to check this is valid
+                if ($this->hdr)
+                {
+                    for ($j=0;$j<count($this->hdr);$j++)
+                    {
+                        if ($hdr[$j] != $this->hdr[$j])
+                        {
+                            echo "{$this->_strAuditFile} header mistmatch, using specified header dump follows\n";
+                            for ($i=0;$i<count($this->hdr);$i++)
+                            {
+                                echo " Should be {$this->_hdr[$i]} is ";
+                                if (isset($hdr[$i]))
+                                    echo $hdr[$i];
+                                echo "\n";
+                            }
+                            $hdr = $this->_hdr;
+                            break;
+                        }
+                    }
+                }
             }
             else
             {

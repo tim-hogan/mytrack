@@ -364,7 +364,7 @@ $start_serial = $last_values["host_serial"] + 1;
 
 $strttyfile = "/dev/ttyS0";
 $strTraceFile = "/var/GPS/TrackData.txt";
-$synclist = new SyncList($strTraceFile,$start_serial);
+$synclist = new SyncList($strTraceFile,$start_serial,["seq","type","t","a","b","c","h"]);
 
 echo "Starting GPS logger with serial {$start_serial}\n";
 $loop_counter = 0;
@@ -426,7 +426,7 @@ if ($f)
         }
 
         echo "End of file received from {$strttyfile}\n";
-        @fclose($f)
+        @fclose($f);
         $f = fopen($strttyfile,"w+");
     }
 }
