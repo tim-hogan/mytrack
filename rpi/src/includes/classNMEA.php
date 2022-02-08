@@ -105,7 +105,7 @@ class NMEA
             else
                 return false;
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             return false;
         }
