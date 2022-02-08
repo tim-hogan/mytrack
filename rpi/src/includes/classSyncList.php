@@ -31,6 +31,18 @@ class SyncList
             echo "Creating new audit file {$strAuditFile}\n";
             $this->_fHandle = fopen($strAuditFile,"w");
             $this->_emptyFile = true;
+
+            if ($this->_hdr)
+            {
+                $line = "";
+                foreach($this->_hdr as $v)
+                    $line .= ",{$v}";
+                $line = trim($line,",");
+                $line = trim($line);
+                $line .= "\n";
+                fwrite($this->_fHandle,$line);
+                $this->_emptyFile = false;
+            }
         }
 
         if ( ! $this->_fHandle )
