@@ -1,5 +1,17 @@
 #!/usr/bin/env php
 <?php
+/**
+ * GPS Daemon
+ * LED STATUS
+ *      Slow flash GREEN - GPS Fx and communciation with host
+ *      Slow falsh YELLOW - GPS Fix and no communciation with host
+ *      Slow flash BLUE - No GPS fix and communciating with host
+ *      Slow flash MAGENTA - No GPS fix and not communciating with host
+ *      Fast flash red - Startup no commuinication with host and no GPS data
+ *      Fast flash magenta - Communication with host and no GPS data
+*/
+
+
 require dirname(__FILE__) . "/includes/classNMEA.php";
 require dirname(__FILE__) . "/includes/classSyncList.php";
 use devt\NMEA\NMEA;
@@ -23,6 +35,11 @@ $last_values["serial"] = 0;
 $last_values["hello"] = false;
 $last_values["maxts"] = 0;
 $last_values['allts'] = array();  //List of the last time stamps deleted if older than last ts and 600 seconds
+$last_values['status'] = 0;
+
+define("STATUS_FIX", 1);
+define("STATUS_SERVER", 2);
+define("STATUS_FIX_AND_SERVER", 3);
 
 $g_strdate = "";
 $ftrace = null;
@@ -94,6 +111,39 @@ function led_fast_blink($colour)
     Led("blink",$colour,2.0,0,0.005);
 }
 
+function changeFix($on)
+{
+    global $last_values;
+
+    if (boolval($last_values["status"] & STATUS_FIX) != $on)
+    {
+        //We have a change in fix status
+        if ($on)
+            $colour = ($last_values["status"] & STATUS_SERVER) ? "green" : "yellow";
+        else
+            $colour = ($last_values["status"] & STATUS_SERVER) ? "blue" : "magenta";
+        led_slow_blink($colour);
+    }
+    $last_values["status"] = $on ? 1 & STATUS_FIX : 0 & & STATUS_FIX;
+}
+
+function changeServerStatus($on)
+{
+    global $last_values;
+
+    if (boolval($last_values["status"] & STATUS_SERVER) != $on)
+    {
+        //We have a change in server status
+        if ($on)
+            $colour = ($last_values["status"] & STATUS_FIX) ? "green" : "blue";
+        else
+            $colour = ($last_values["status"] & STATUS_FIX) ? "yellow" : "magenta";
+        led_slow_blink($colour);
+    }
+
+    $last_values["status"] = $on ? 1 & STATUS_SERVER : 0 & & STATUS_SERVER;
+
+}
 
 function pointInBox($lat,$lon,$box)
 {
@@ -376,8 +426,11 @@ if ($f)
                 $v = NMEA::decodeSentence($s,$g_strdate);
                 if ($v)
                 {
+                    if (isset($v["nofix"]))
+                        changeFix(false);
                     if ($v["type"] == "GNGGA")
                     {
+                        changeFix(true);
                         unset($v["type"]);
                         traceTime($v);
                         if (checkRequired($v,$synclist))
@@ -388,14 +441,14 @@ if ($f)
                                 $rsltList = sendBunch($synclist);
                                 if ($rsltList !== false && count($rsltList) > 0)
                                 {
-                                    led_slow_blink("green");
+                                    changeServerStatus(true);
                                     foreach($rsltList as $seq)
                                     {
                                         $synclist->remove($seq);
                                     }
                                 }
                                 else
-                                    led_slow_blink("blue");
+                                    changeServerStatus(false);
                             }
                         }
                     }
@@ -414,13 +467,20 @@ if ($f)
                 if ($num_locs > 0)
                 {
                     $rsltList = sendBunch($synclist);
-                    foreach($rsltList as $seq)
+                    if ($rsltList !== false && count($rsltList) > 0)
                     {
-                        $synclist->remove($seq);
+                        changeServerStatus(true);
+                        foreach($rsltList as $seq)
+                        {
+                            $synclist->remove($seq);
+                        }
                     }
+                    else
+                        changeServerStatus(false);
                 }
             }
             $loop_counter++;
+            usleep(1000);
         }
 
         echo "End of file received from {$strttyfile}\n";

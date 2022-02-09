@@ -56,6 +56,7 @@ fi
 if [ "$UNINSTALL" -eq 1 ] ; then
     echo -e "Unistall GPSDaemon"
     systemctl stop GPS
+    systemctl disable GPS
     rm /etc/systemd/system/GPS.service
     systemctl daemon-reload
     rm -r /etc/GPS
@@ -138,19 +139,22 @@ cp ${DIR}/tmpfiles/bin/GPS.service /etc/systemd/system
 echo "Copy LedDaemon.service file"
 cp ${DIR}/tmpfiles/led/LedDaemon.service /etc/systemd/system
 
+systemctl disbale LedDaemon
+systemctl disbale GPS
+
 echo "Reloading all daemons"
 systemctl daemon-reload
 
 echo "Enabling the LedDaemon service"
-systemctl start LedDaemon
 systemctl enable LedDaemon
+systemctl start LedDaemon
 systemctl status LedDaemon
 
 sleep 5
 
 echo "Enabling the GPS service"
-systemctl start GPS
 systemctl enable GPS
+systemctl start GPS
 systemctl status GPS
 
 echo "Cleanup"

@@ -170,7 +170,7 @@ class NMEA
         {
             case '$GNRMC':
                 if ($fields[2] != "A")
-                    return false;  //No Fix
+                    return ["nofix" => true];  //No Fix
                 $strdate = self::decodeDate($fields[9]);
                 $ts = self::decodeTime($fields[1]);
                 $strtime = $ts[0];
@@ -189,8 +189,7 @@ class NMEA
                 if (strlen($strdate) < 8)
                     return false;
                 if ($fields[6] == "0")
-                    return false;
-
+                    return ["nofix" => true];  //No Fix
                 $ts = self::decodeTime($fields[1]);
                 $strtime = $ts[0];
                 $timemilli = $ts[1];

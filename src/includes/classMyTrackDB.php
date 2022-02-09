@@ -58,7 +58,9 @@ class trip extends TableRow
                 [
                     "idtrip" =>["type" => "int"],
                     "trip_start" =>["type" => "datetime"],
-                    "trip_end" =>["type" => "datetime"]
+                    "trip_end" =>["type" => "datetime"],
+                    "trip_device" =>["type" => "int"],
+                    "trip_name" =>["type" => "varchar"]
                 ]
             );
     }
@@ -163,9 +165,43 @@ class MyTrackDB extends SQLPlus
         return false;
     }
 
-    function allLocsFor($id)
+    public function allLocsFor($id)
     {
         return $this->p_all("select * from loc where loc_device = ? order by loc_timestamp","i",$id);
+    }
+
+
+    public function allLocsForDeviceNoTrip($deviceid)
+    {
+        return $this->p_all("select * from loc where loc_device = ? and loc_trip is null order by loc_timestamp","i",$deviceid);
+    }
+
+    public function addTripToLoc($tripid,$locid)
+    {
+        return $this->p_update("update loc set loc_trip = ? where idloc = ?","ii",$tripid,$locid);
+    }
+
+    //*********************************************************************
+    // trip functions
+    //*********************************************************************
+    public function newTrip($did,$strTS)
+    {
+        $rslt = $this->p_create("insert into trip (trip_device,trip_start) values (?)","is",$did,$strTS);
+        if ($rslt)
+            return $this->insert_id;
+        return null;
+    }
+
+    public function findTrip($did,$strTs,$seconds)
+    {
+        $endTs = new DateTime($strTs);
+        $endTs->setTimestamp($endTs->getTimestamp()+$seconds);
+        $strEndTs = $endTs->format("T-m-d H:i:s");
+
+        $trip =  $this->p_singlequery("select * from trip where trip_device = ? and trip_start < ? and trip_end < ?","iss",$did,$strTs,$strEndTs);
+        if ($trip)
+            return $trip["idtrip"];
+        return null;
     }
 
     //*********************************************************************
