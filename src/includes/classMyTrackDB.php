@@ -39,7 +39,26 @@ class loc extends TableRow
                     "loc_lat" =>["type" => "double"],
                     "loc_lon" =>["type" => "double"],
                     "loc_height" =>["type" => "double"],
-                    "loc_hdop[" =>["type" => "double"]
+                    "loc_hdop" =>["type" => "double"],
+                    "loc_trip" =>["type" => "int"]
+                ]
+            );
+    }
+}
+
+class trip extends TableRow
+{
+    function __construct($tabledata=null)
+    {
+        if ($tabledata)
+            parent::__construct($tabledata);
+        else
+            parent::__construct
+            (
+                [
+                    "idtrip" =>["type" => "int"],
+                    "trip_start" =>["type" => "datetime"],
+                    "trip_end" =>["type" => "datetime"]
                 ]
             );
     }

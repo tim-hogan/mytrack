@@ -216,6 +216,20 @@ function getHostLastSerial()
     return false;
 }
 
+function startServer()
+{
+    global $last_values;
+    $last_values["hello"] = sendHello();
+    if ($last_values["hello"])
+    {
+        $v = getHostLastSerial();
+        if ($v)
+        {
+            $last_values["host_serial"] = $v;
+        }
+    }
+}
+
 function sendBunch($synclist)
 {
     global $globalParams;
@@ -228,17 +242,7 @@ function sendBunch($synclist)
 
     //Have we sent a hello yet?
     if (! $last_values["hello"] )
-    {
-        $last_values["hello"] = sendHello();
-        if ($last_values["hello"])
-        {
-            $v = getHostLastSerial();
-            if ($v)
-            {
-                $last_values["host_serial"] = $v;
-            }
-        }
-    }
+        startServer();
 
     if ($last_values["hello"])
     {
@@ -349,14 +353,7 @@ echo " maxspeed - {$globalParams["max_speed"]}; mindist - {$globalParams["min_di
 echo " box  [{$globalParams["box"]['minlat']},{$globalParams["box"]['minlon']}] - [{$globalParams["box"]['maxlat']},{$globalParams["box"]['maxlon']}]\n";
 
 
-$last_values["hello"] = sendHello();
-
-if ($last_values["hello"])
-{
-    $v = getHostLastSerial();
-    if ($v)
-        $last_values["host_serial"] = $v;
-}
+startServer();
 $start_serial = $last_values["host_serial"] + 1;
 
 $strttyfile = "/dev/ttyS0";
@@ -408,6 +405,10 @@ if ($f)
             //Check that we have a bunch to send every 200 GPS reads
             if ($loop_counter % 1000 == 0)
             {
+                //Have we sent a hello yet?
+                if (! $last_values["hello"] )
+                    startServer();
+
                 $loop_counter = 0;
                 $num_locs = $synclist->count();
                 if ($num_locs > 0)
