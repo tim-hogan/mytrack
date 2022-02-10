@@ -68,6 +68,26 @@ class trip extends TableRow
     }
 }
 
+class audit extends TableRow
+{
+    function __construct($tabledata=null)
+    {
+        if ($tabledata)
+            parent::__construct($tabledata);
+        else
+            parent::__construct
+            (
+                [
+                    "idaudit" =>["type" => "int"],
+                    "audit_device" =>["type" => "int"],
+                    "audit_type" =>["type" => "varchar"],
+                    "audit_timestamp" =>["type" => "datetime"],
+                    "audit_description" =>["type" => "varchar"]
+                ]
+            );
+    }
+}
+
 class MyTrackDB extends SQLPlus
 {
     function __construct($params)
@@ -224,6 +244,17 @@ class MyTrackDB extends SQLPlus
     public function allTripsForDevice($deviceid)
     {
         return $this->p_all("select * from trip where trip_device = ?","i",$deviceid);
+    }
+
+    //*********************************************************************
+    // audit functions
+    //*********************************************************************
+    public function createAudit($type,$description,$deviceid=null)
+    {
+        if ($device)
+            return $this->p_create("insert into audit (audit_type,audit_description,audit_device) value (?,?,?)","ssi",$type,$description,$deviceid);
+        else
+            return $this->p_create("insert into audit (audit_type,audit_description) value (?,?)","ss",$type,$description);
     }
 
     //*********************************************************************

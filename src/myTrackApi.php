@@ -206,7 +206,10 @@ function processFixStatus($req,$params)
 
     //Update the IP address of the device
     $DB->updateDeviceFixStatus($device->iddevice,$fixtstatus);
-
+    if ($fixtstatus)
+        $DB->createAudit("fix","Device has fix",$device->iddevice);
+    else
+        $DB->createAudit("fix","No Fix",$device->iddevice);
     $ret = array();
     $ret['meta'] = newOKMetaHdr($req);
     $ret['data'] = [];
