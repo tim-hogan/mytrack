@@ -428,7 +428,7 @@ if ($f)
                 {
                     if (isset($v["nofix"]))
                         changeFix(false);
-                    if ($v["type"] == "GNGGA")
+                    if (isset($v["type"]) && $v["type"] == "GNGGA")
                     {
                         changeFix(true);
                         unset($v["type"]);
