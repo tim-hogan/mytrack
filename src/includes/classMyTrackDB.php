@@ -16,7 +16,9 @@ class device extends TableRow
                     "device_uuid" =>["type" => "varchar"],
                     "device_serial" =>["type" => "int"],
                     "device_ip_address"=>["type" => "varchar"],
-                    "device_name" =>["type" => "varchar"]
+                    "device_name" =>["type" => "varchar"],
+                    "device_last_fix_status" => ["type" => "boolean"],
+                    "device_last_fix_status_timestmap" => ["type" => "datetime"]
                 ]
             );
     }
@@ -88,7 +90,7 @@ class MyTrackDB extends SQLPlus
 
     public function allDevices()
     {
-        return $this->all("select * from device");
+        return $this->p_all("select * from device",null,null);
     }
 
     public function lastDeviceSerial()
@@ -115,6 +117,16 @@ class MyTrackDB extends SQLPlus
     {
         $strDT = (new DateTime())->format("Y-m-d H:i:s");
         return $this->p_update("update device set device_ip_address = ?, device_last_hello = ? where iddevice = ?","ssi",$ipaddress,$strDT,$id);
+    }
+
+
+    public function updateDeviceFixStatus($id,$status)
+    {
+        $strDT = (new DateTime())->format("Y-m-d H:i:s");
+        if ($status)
+            return $this->p_update("update device set device_last_fix_status = 1, device_last_fix_status_timestmap = ? where iddevice = ?","si",$strDT,$id);
+        else
+            return $this->p_update("update device set device_last_fix_status = 0, device_last_fix_status_timestmap = ? where iddevice = ?","si",$strDT,$id);
     }
 
     //*********************************************************************
@@ -186,7 +198,7 @@ class MyTrackDB extends SQLPlus
     //*********************************************************************
     public function newTrip($did,$strTS)
     {
-        $rslt = $this->p_create("insert into trip (trip_device,trip_start) values (?)","is",$did,$strTS);
+        $rslt = $this->p_create("insert into trip (trip_device,trip_start) values (?,?)","is",$did,$strTS);
         if ($rslt)
             return $this->insert_id;
         return null;
@@ -202,6 +214,16 @@ class MyTrackDB extends SQLPlus
         if ($trip)
             return $trip["idtrip"];
         return null;
+    }
+
+    public function updateTripLastTimestamp($tripid,$strTS)
+    {
+        return $this->p_update("update trip set trip_end = ? where idtrip = ?","si",$strTS,$tripid);
+    }
+
+    public function allTripsForDevice($deviceid)
+    {
+        return $this->p_all("select * from trip where trip_device = ?","i",$deviceid);
     }
 
     //*********************************************************************

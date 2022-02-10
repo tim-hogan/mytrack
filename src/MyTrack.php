@@ -24,6 +24,14 @@ $DB = new MyTrackDB($devt_environment->getDatabaseParameters());
         #functions li.link {cursor: pointer; color: blue;}
     </style>
     <script>
+        function action(n) {
+            let w = n.getAttribute("where");
+            let l = document.getElementsByClassName('sel');
+            for (let i = 0; i < l.length; i++) {
+                if (l[i].checked)
+                    window.location = w + "?v=" + l[i].value;
+            }
+        }
         function download() {
             let l = document.getElementsByClassName('sel');
             for (let i = 0; i < l.length; i++) {
@@ -61,7 +69,7 @@ $DB = new MyTrackDB($devt_environment->getDatabaseParameters());
         <div id="functions">
             <h2>FUNCTIONS</h2>
             <ul>
-                <li>TRIPS</li>
+                <li class="link" where="Trips.php" onclick="action(this)">TRIPS</li>
                 <li class="link" onclick="download()">DOWLOAD CSV</li>
             </ul>
         </div>

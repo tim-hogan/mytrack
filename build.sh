@@ -150,6 +150,7 @@ cp ../src/CreateTrips.php                              ./webfiles
 cp ../src/Download.php                                 ./webfiles
 cp ../src/MyTrack.php                                  ./webfiles
 cp ../src/myTrackApi.php                               ./webfiles
+cp ../src/Trips.php                                    ./webfiles
 
 #copy includes
 emptyandcreate webfiles/includes
@@ -161,6 +162,7 @@ cp ../../devt/classes/classEnvironment.php             ./webfiles/includes
 cp ../../devt/classes/classParseText.php               ./webfiles/includes
 cp ../../devt/classes/classSQLPlus2.php                ./webfiles/includes
 cp ../../devt/classes/classSecure.php                  ./webfiles/includes
+cp ../../devt/classes/classTime.php                    ./webfiles/includes
 cp ../../devt/classes/classVault.php                   ./webfiles/includes
 
 

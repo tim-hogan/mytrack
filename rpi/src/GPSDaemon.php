@@ -123,6 +123,7 @@ function changeFix($on)
         else
             $colour = ($last_values["status"] & STATUS_SERVER) ? "blue" : "magenta";
         led_slow_blink($colour);
+        sendFixStatus($on);
     }
     $last_values["status"] = $on ? 1 & STATUS_FIX : 0 & STATUS_FIX;
 }
@@ -206,6 +207,32 @@ function getResultData($result)
             if (isset($result["data"]))
                 return $result["data"];
         }
+    }
+    return false;
+}
+
+function sendFixStatus($have_fix)
+{
+    global $globalParams;
+
+
+    $params["device"] = $globalParams["uuid"];
+    $params["fixstatus"] = $have_fix;
+
+    $url = "https://{$globalParams["host"]}/{$globalParams["api"]}?r=fixstatus";
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($params));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+
+    $result = curl_exec($ch);
+    if ($result)
+    {
+        $result = json_decode($result,true);
+        if (isset($result["meta"]) && isset($result["meta"] ["status"]) && $result["meta"] ["status"])
+            return true;
     }
     return false;
 }
