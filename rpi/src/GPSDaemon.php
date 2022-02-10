@@ -124,7 +124,7 @@ function changeFix($on)
             $colour = ($last_values["status"] & STATUS_SERVER) ? "blue" : "magenta";
         led_slow_blink($colour);
     }
-    $last_values["status"] = $on ? 1 & STATUS_FIX : 0 & & STATUS_FIX;
+    $last_values["status"] = $on ? 1 & STATUS_FIX : 0 & STATUS_FIX;
 }
 
 function changeServerStatus($on)
@@ -141,7 +141,7 @@ function changeServerStatus($on)
         led_slow_blink($colour);
     }
 
-    $last_values["status"] = $on ? 1 & STATUS_SERVER : 0 & & STATUS_SERVER;
+    $last_values["status"] = $on ? 1 & STATUS_SERVER : 0 & STATUS_SERVER;
 
 }
 
