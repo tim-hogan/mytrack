@@ -14,6 +14,7 @@
 
 require dirname(__FILE__) . "/includes/classNMEA.php";
 require dirname(__FILE__) . "/includes/classSyncList.php";
+require dirname(__FILE__) . "/includes/classOptions.php";
 use devt\NMEA\NMEA;
 use devt\SyncList\SyncList;
 
@@ -35,7 +36,7 @@ $last_values["serial"] = 0;
 $last_values["hello"] = false;
 $last_values["maxts"] = 0;
 $last_values['allts'] = array();  //List of the last time stamps deleted if older than last ts and 600 seconds
-$last_values['status'] = 0;
+$last_values['status'] = new option();
 
 define("STATUS_FIX", 1);
 define("STATUS_SERVER", 2);
@@ -114,42 +115,33 @@ function led_fast_blink($colour)
 function changeFix($on)
 {
     global $last_values;
-
-    if (boolval($last_values["status"] & STATUS_FIX) != $on)
+    if (! $last_values["status"]->same(STATUS_FIX,$on) )
     {
         //We have a change in fix status
         if ($on)
-            $colour = ($last_values["status"] & STATUS_SERVER) ? "green" : "yellow";
+            $colour = ($last_values["status"]->isset(STATUS_SERVER) ? "green" : "yellow";
         else
-            $colour = ($last_values["status"] & STATUS_SERVER) ? "blue" : "magenta";
+            $colour = ($last_values["status"]->isset(STATUS_SERVER) ? "blue" : "magenta";
         led_slow_blink($colour);
         sendFixStatus($on);
     }
-    if ($on)
-        $last_values["status"] = $last_values["status"] | STATUS_FIX;
-    else
-        $last_values["status"] = $last_values["status"] &  ~ STATUS_FIX;
+    $last_values["status"]->setstate(STATUS_FIX,$on);
 }
 
 function changeServerStatus($on)
 {
     global $last_values;
 
-    if (boolval($last_values["status"] & STATUS_SERVER) != $on)
+    if (! $last_values["status"]->same(STATUS_SERVER,$on) )
     {
         //We have a change in server status
         if ($on)
-            $colour = ($last_values["status"] & STATUS_SERVER) ? "green" : "blue";
+            $colour = ($last_values["status"]->isset(STATUS_FIX) ? "green" : "blue";
         else
-            $colour = ($last_values["status"] & STATUS_SERVER) ? "yellow" : "magenta";
+            $colour = ($last_values["status"]->isset(STATUS_FIX) ? "yellow" : "magenta";
         led_slow_blink($colour);
     }
-
-    if ($on)
-        $last_values["status"] = $last_values["status"] | STATUS_SERVER;
-    else
-        $last_values["status"] = $last_values["status"] &  ~ STATUS_SERVER;
-
+    $last_values["status"]->setstate(STATUS_SERVER,$on);
 }
 
 function pointInBox($lat,$lon,$box)

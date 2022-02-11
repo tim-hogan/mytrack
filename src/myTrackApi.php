@@ -172,6 +172,7 @@ function processHello($req,$params)
 
     //Update the IP address of the device
     $DB->updateDeviceIP($device->iddevice,$ipaddress);
+    $DB->createAudit("hello","Device hello",$device->iddevice);
 
     $ret = array();
     $ret['meta'] = newOKMetaHdr($req);
@@ -193,7 +194,7 @@ function processFixStatus($req,$params)
         $uuid = $params["device"];
 
     if (isset($params["fixstatus"]))
-        $fixtstatus = boolval(["fixstatus"]);
+        $fixtstatus = boolval($params["fixstatus"]);
 
     $device = $DB->getDeviceByUUID($uuid);
     if (! $device)
@@ -209,7 +210,7 @@ function processFixStatus($req,$params)
     if ($fixtstatus)
         $DB->createAudit("fix","Device has fix",$device->iddevice);
     else
-        $DB->createAudit("fix","No Fix",$device->iddevice);
+        $DB->createAudit("nofix","No Fix",$device->iddevice);
     $ret = array();
     $ret['meta'] = newOKMetaHdr($req);
     $ret['data'] = [];
