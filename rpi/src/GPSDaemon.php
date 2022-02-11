@@ -119,9 +119,9 @@ function changeFix($on)
     {
         //We have a change in fix status
         if ($on)
-            $colour = ($last_values["status"]->isset(STATUS_SERVER) ? "green" : "yellow";
+            $colour = ($last_values["status"]->isset(STATUS_SERVER)) ? "green" : "yellow";
         else
-            $colour = ($last_values["status"]->isset(STATUS_SERVER) ? "blue" : "magenta";
+            $colour = ($last_values["status"]->isset(STATUS_SERVER)) ? "blue" : "magenta";
         led_slow_blink($colour);
         sendFixStatus($on);
     }
@@ -136,9 +136,9 @@ function changeServerStatus($on)
     {
         //We have a change in server status
         if ($on)
-            $colour = ($last_values["status"]->isset(STATUS_FIX) ? "green" : "blue";
+            $colour = ($last_values["status"]->isset(STATUS_FIX)) ? "green" : "blue";
         else
-            $colour = ($last_values["status"]->isset(STATUS_FIX) ? "yellow" : "magenta";
+            $colour = ($last_values["status"]->isset(STATUS_FIX)) ? "yellow" : "magenta";
         led_slow_blink($colour);
     }
     $last_values["status"]->setstate(STATUS_SERVER,$on);
