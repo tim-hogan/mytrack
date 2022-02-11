@@ -93,6 +93,7 @@ cp ${DIR}/tmpfiles/bin/GPSSetup.php /etc/GPS/GPSSetup.php
 mkdir -p /etc/GPS/includes
 cp ${DIR}/tmpfiles/includes/classNMEA.php /etc/GPS/includes/classNMEA.php
 cp ${DIR}/tmpfiles/includes/classSyncList.php /etc/GPS/includes/classSyncList.php
+cp ${DIR}/tmpfiles/includes/classOptions.php /etc/GPS/includes/classOptions.php
 
 chmod +x /etc/GPS/GPSDaemon.php
 
@@ -133,14 +134,18 @@ systemctl stop LedDaemon
 
 sleep 2
 
+
+echo "Disable LedDaemon and GPS services"
+systemctl disable LedDaemon
+sleep 1
+systemctl disable GPS
+
+
 #Need to copy the service file 
 echo "Copy GPS.service file"
 cp ${DIR}/tmpfiles/bin/GPS.service /etc/systemd/system
 echo "Copy LedDaemon.service file"
 cp ${DIR}/tmpfiles/led/LedDaemon.service /etc/systemd/system
-
-systemctl disable LedDaemon
-systemctl disable GPS
 
 echo "Reloading all daemons"
 systemctl daemon-reload
