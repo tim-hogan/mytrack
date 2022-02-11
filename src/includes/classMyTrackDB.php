@@ -251,7 +251,7 @@ class MyTrackDB extends SQLPlus
     //*********************************************************************
     public function createAudit($type,$description,$deviceid=null)
     {
-        if ($device)
+        if ($deviceid)
             return $this->p_create("insert into audit (audit_type,audit_description,audit_device) value (?,?,?)","ssi",$type,$description,$deviceid);
         else
             return $this->p_create("insert into audit (audit_type,audit_description) value (?,?)","ss",$type,$description);
