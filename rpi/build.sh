@@ -65,6 +65,7 @@ cp ../rpi/src/GPSSetup.php						./bin
 emptyandcreate includes
 cp ../rpi/src/includes/classNMEA.php				./includes
 cp ../rpi/src/includes/classSyncList.php			./includes
+cp ../../../devt/classes/classOptions.php           ./includes
 
 #led daemon
 emptyandcreate led
