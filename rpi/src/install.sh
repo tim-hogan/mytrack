@@ -139,8 +139,8 @@ cp ${DIR}/tmpfiles/bin/GPS.service /etc/systemd/system
 echo "Copy LedDaemon.service file"
 cp ${DIR}/tmpfiles/led/LedDaemon.service /etc/systemd/system
 
-systemctl disbale LedDaemon
-systemctl disbale GPS
+systemctl disable LedDaemon
+systemctl disable GPS
 
 echo "Reloading all daemons"
 systemctl daemon-reload
