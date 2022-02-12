@@ -69,6 +69,7 @@ $DB = new MyTrackDB($devt_environment->getDatabaseParameters());
         <div id="functions">
             <h2>FUNCTIONS</h2>
             <ul>
+                <li><a href="CreateTrips.php">CREATE TRIPS</a></li>
                 <li class="link" where="Trips.php" onclick="action(this)">TRIPS</li>
                 <li class="link" onclick="download()">DOWLOAD CSV</li>
             </ul>

@@ -208,6 +208,11 @@ class MyTrackDB extends SQLPlus
         return $this->p_all("select * from loc where loc_device = ? and loc_trip is null order by loc_timestamp","i",$deviceid);
     }
 
+    public function allLocsForTrip($tripid)
+    {
+        return $this->p_all("select * from loc where loc_trip = ? order by loc_timestamp","i",$tripid);
+    }
+
     public function addTripToLoc($tripid,$locid)
     {
         return $this->p_update("update loc set loc_trip = ? where idloc = ?","ii",$tripid,$locid);

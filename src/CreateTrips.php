@@ -13,6 +13,7 @@ while ($device = $r->fetch_assoc())
     $tripid = null;
     $lastloc = null;
 
+    echo "Trips for new device {$device["iddevice"]}<br/>";
     $r2 = $DB->allLocsForDeviceNoTrip($device["iddevice"]);
     while ($loc = $r2->fetch_assoc())
     {
@@ -24,7 +25,8 @@ while ($device = $r->fetch_assoc())
             if (!$tripid)
             {
                 //Is there a trip for this device thats end time is
-                $tripid = $DB->findTrip($device["iddevice"],$dtLocTs,(10*60));
+                $tripid = $DB->findTrip($device["iddevice"],$loc["loc_timestamp"],(10*60));
+                echo "Found existing trip {$tripid}<br/>";
                 if (!$tripid)
                     //Start a new trip
                     $tripid = $DB->newTrip($device["iddevice"],$loc["loc_timestamp"]);
@@ -34,8 +36,12 @@ while ($device = $r->fetch_assoc())
             if ($lastlocTS != null && ($dtLocTs - $lastlocTS) > (10 * 60) )
             {
                 if ($tripid && $lastloc)
+                {
                     $DB->updateTripLastTimestamp($tripid,$lastloc["loc_timestamp"]);
+                    echo " trip completed {$tripid}<br/>";
+                }
                 $tripid = $DB->newTrip($device["iddevice"],$loc["loc_timestamp"]);
+                echo "Start of new trip {$tripid}<br/>";
             }
 
             $DB->addTripToLoc($tripid,$loc["idloc"]);
